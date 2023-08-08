@@ -1,0 +1,30 @@
+name: Product Description Generator App CI (Lint, Build)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [18]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: SKIP_ENV_VALIDATION=true npm run lint
+
+      - name: Lint
+        run: SKIP_ENV_VALIDATION=true npm run build
