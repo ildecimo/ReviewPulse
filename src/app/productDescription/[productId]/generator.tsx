@@ -23,7 +23,7 @@ export default function Generator({
       promptAttributes: DEFAULT_GUIDED_ATTRIBUTES,
     });
     setInitialLoad(true);
-  }, []);
+  }, [initialDescription, setResults]);
 
   return (
     <PromptAttributesProvider>
