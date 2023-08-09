@@ -1,4 +1,4 @@
-name: Product Description Generator App CI (Lint, Build)
+name: ildecimo BigAI - Product Review App CI
 
 on:
   push:
