@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 interface PageProps {
   params: { productId: string };
   searchParams: { product_name: string };
