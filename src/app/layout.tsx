@@ -1,7 +1,7 @@
 import { Source_Sans_3 } from 'next/font/google';
 import { type Metadata } from 'next/types';
 import StyledComponentsRegistry from '~/lib/registry';
-import ThemeProvider from './theme-provider';
+import ThemeProvider from '../components/ThemeProvider';
 
 const sourceSans = Source_Sans_3({
   subsets: ['latin'],
