@@ -42,7 +42,7 @@ export default async function Page(props: PageProps) {
 
   return (
     <div>
-      <ProductReviewList productName={product.name} />
+      <ProductReviewList productName={product.name} reviews={reviews} />
     </div>
   );
 }

@@ -7,7 +7,7 @@ export interface Review {
   name: string;
   date_reviewed: string;
   id: number;
-  product_id: number;
+  // product_id: number;
   date_created: string;
   date_modified: string;
 }

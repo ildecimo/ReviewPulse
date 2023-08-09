@@ -37,7 +37,7 @@ const reviewSchema = z.object({
       name: z.string(),
       date_reviewed: z.string(),
       id: z.number(),
-      product_id: z.number(),
+      // product_id: z.number(),
       date_created: z.string(),
       date_modified: z.string(),
     })
@@ -172,7 +172,12 @@ export async function fetchProductReviews(
     throw new Error('Failed to fetch reviews');
   }
 
-  const parsedReviews = reviewSchema.safeParse(await response.json());
+  const json = await response.json()
+
+  console.log('***', json);
+  
+
+  const parsedReviews = reviewSchema.safeParse(json);
 
   console.log(parsedReviews);
 
