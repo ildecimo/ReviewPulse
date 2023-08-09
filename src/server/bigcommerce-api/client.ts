@@ -172,12 +172,7 @@ export async function fetchProductReviews(
     throw new Error('Failed to fetch reviews');
   }
 
-  const json = await response.json()
-
-  console.log('***', json);
-  
-
-  const parsedReviews = reviewSchema.safeParse(json);
+  const parsedReviews = reviewSchema.safeParse(await response.json());
 
   console.log(parsedReviews);
 
