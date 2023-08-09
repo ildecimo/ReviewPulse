@@ -6,9 +6,11 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "dev2": "next dev -p 3001",
     "lint": "next lint",
     "start": "next start",
     "ngrok": "ngrok http --hostname=webhooks-commerce.ildecimo.com 3000",
+    "ngrok2": "ngrok http --hostname=webhooks-commerce.ildecimo.com 3001",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write **/*.{js,ts,tsx}"
   },
