@@ -1,7 +1,7 @@
 import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
 
-import { fetchProductWithAttributes } from '~/server/bigcommerce-api';
+import { fetchProductWithAttributes, fetchReviews } from '~/server/bigcommerce-api';
 
 import ProductReviewList from '~/components/ProductReviewList';
 
@@ -31,6 +31,14 @@ export default async function Page(props: PageProps) {
     accessToken,
     authorized.storeHash
   );
+
+  const reviews = await fetchReviews(
+    id,
+    accessToken,
+    authorized.storeHash
+  );
+
+  console.log(reviews);
 
   return (
     <div>

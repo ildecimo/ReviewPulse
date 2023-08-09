@@ -9,7 +9,13 @@ interface ProductReviewListProps {
 const ProductReviewList = ({ productName }: ProductReviewListProps) => {
   return (
     <div>
-      <H1>Reviews for - {productName}</H1>
+      <div
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        <H1>Reviews for - {productName}</H1>
+      </div>
     </div>
   );
 };

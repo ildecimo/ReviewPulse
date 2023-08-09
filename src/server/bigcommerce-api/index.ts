@@ -1,5 +1,10 @@
-import { type Product } from 'types';
-import { fetchProduct, fetchCategories, fetchBrand } from './client';
+import { type Product, type Review } from 'types';
+import {
+  fetchProduct,
+  fetchCategories,
+  fetchBrand,
+  fetchProductReviews,
+} from './client';
 
 export const fetchProductWithAttributes = async (
   id: number,
@@ -22,4 +27,14 @@ export const fetchProductWithAttributes = async (
   const brand = brandPromise.status === 'fulfilled' ? brandPromise.value : '';
 
   return { ...product, id, brand, categoriesNames } as Product;
+};
+
+export const fetchReviews = async (
+  id: number,
+  accessToken: string,
+  storeHash: string
+): Promise<Review[]> => {
+  const reviews = await fetchProductReviews(id, accessToken, storeHash);
+
+  return reviews;
 };
