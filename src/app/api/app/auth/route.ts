@@ -33,6 +33,16 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Invalid query parameters', { status: 400 });
   }
 
+  console.log({
+    client_id: env.CLIENT_ID,
+    client_secret: env.CLIENT_SECRET,
+    code: parsedParams.data.code,
+    context: parsedParams.data.context,
+    scope: parsedParams.data.scope,
+    grant_type: 'authorization_code',
+    redirect_uri: env.AUTH_CALLBACK,
+  });
+
   const oauthResponse = await fetch(`${BIGCOMMERCE_LOGIN_URL}/oauth2/token`, {
     method: 'POST',
     headers: {
@@ -53,6 +63,10 @@ export async function GET(req: NextRequest) {
   const parsedOAuthResponse = oauthResponseSchema.safeParse(
     await oauthResponse.json()
   );
+
+  console.log('------------------------------------');
+  console.log(parsedOAuthResponse);
+  console.log('------------------------------------');
 
   if (!parsedOAuthResponse.success) {
     return new NextResponse('Invalid access token response', { status: 500 });
