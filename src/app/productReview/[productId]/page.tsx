@@ -38,11 +38,9 @@ export default async function Page(props: PageProps) {
     authorized.storeHash
   );
 
-  console.log(reviews);
-
   return (
     <div>
-      <ProductReviewList productName={product.name} reviews={reviews} />
+      <ProductReviewList product={product} reviews={reviews} />
     </div>
   );
 }

@@ -13,5 +13,6 @@ export interface Product extends NewProduct {
   categoriesNames: string;
   videosDescriptions: string;
   imagesDescriptions: string;
+  thumbnailImage: string;
   custom_fields: { name: string; value: string }[];
 }

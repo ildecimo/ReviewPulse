@@ -1,16 +1,17 @@
 'use client';
-import { useMemo } from "react";
-import { H1, Table, Badge, Link, Box } from '@bigcommerce/big-design';
+import { useMemo } from 'react';
+import { Table, Badge, Link, Box, H1 } from '@bigcommerce/big-design';
+import Image from 'next/image';
 import {
   StarBorderIcon,
   StarHalfIcon,
   StarIcon,
 } from '@bigcommerce/big-design-icons';
-import { type Review } from 'types';
+import { type Review, type Product } from 'types';
 import { convertToDateString } from '~/utils/utils';
 
 interface ProductReviewListProps {
-  productName: string;
+  product: Product;
   reviews: Review[];
 }
 
@@ -63,39 +64,65 @@ const ReviewRating = ({ rating }: ReviewRatingProps) => {
   return <div className="flex">{stars}</div>;
 };
 
-const ProductReviewList = ({
-  productName,
-  reviews,
-}: ProductReviewListProps) => {
-
+const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
   const averageRating = useMemo(() => {
-    return reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
-  }
-  , [reviews]);
+    return (
+      reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+    );
+  }, [reviews]);
 
-  const approvedReviewsCount = useMemo(() => {
-    return reviews.filter(review => review.status === 'approved').length;
-  }
-  , [reviews]);
+  const approvedReviews = useMemo(() => {
+    return reviews.filter((review) => review.status === 'approved');
+  }, [reviews]);
+
+  const averageApprovedRating = useMemo(() => {
+    return (
+      approvedReviews.reduce((acc, review) => acc + review.rating, 0) /
+      approvedReviews.length
+    );
+  }, [approvedReviews]);
 
   return (
     <div>
       <div>
-        <div className="text-center">
-          <H1>Reviews for - <strong>{productName}</strong></H1>
+        <div>
+          <Link href="/">All Products</Link> / {product.name}
         </div>
-        <div className="my-12">
+        <div className="my-12 flex justify-between items-end flex-wrap">
           <Box border="box" padding="small" borderRadius="normal">
-              <div>
-                <strong>Reviews count:</strong><span className="pl-2">{reviews.length}</span>
-              </div>
-              <div>
-                <strong>Approved:</strong><span className="pl-2">{approvedReviewsCount}</span>
-              </div>
-              <div className="flex">
-                <strong>Average Rating:</strong><span className="pl-2"><ReviewRating rating={averageRating} /></span>
-              </div>
+            <div>
+              <strong>Reviews:</strong>
+              <span className="pl-2">{reviews.length}</span>
+            </div>
+            <div className="flex">
+              <strong>Average Rating:</strong>
+              <span className="pl-2">
+                <ReviewRating rating={averageRating} />
+              </span>
+            </div>
+            <div className="mt-4">
+              <strong>Approved:</strong>
+              <span className="pl-2">{approvedReviews.length}</span>
+            </div>
+            <div className="flex">
+              <strong>Average Approved Rating:</strong>
+              <span className="pl-2">
+                <ReviewRating rating={averageApprovedRating} />
+              </span>
+            </div>
           </Box>
+
+          <div>
+            <H1>
+              <strong>{product.name}</strong>
+            </H1>
+            <Image
+              src={product.thumbnailImage}
+              alt={product.name}
+              width={300}
+              height={300}
+            />
+          </div>
         </div>
         <Table
           columns={[
@@ -130,8 +157,10 @@ const ProductReviewList = ({
             {
               header: 'Action',
               hash: 'action',
-              render: ({id}) => <Link href={`/review/${id}`}>AI Explore</Link>,
-            }
+              render: ({ id }) => (
+                <Link href={`/review/${id}`}>AI Explore</Link>
+              ),
+            },
           ]}
           items={reviews}
           stickyHeader

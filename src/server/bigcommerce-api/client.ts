@@ -11,7 +11,7 @@ const productSchema = z.object({
     width: z.number(),
     depth: z.number(),
     videos: z.array(z.object({ description: z.string() })),
-    images: z.array(z.object({ description: z.string() })),
+    images: z.array(z.object({ description: z.string(), url_standard: z.string(), is_thumbnail: z.boolean() })),
     custom_fields: z.array(z.object({ name: z.string(), value: z.string() })),
     brand_id: z.number().optional(),
     categories: z.array(z.number()),
@@ -102,6 +102,7 @@ export async function fetchProduct(
     ...restAttr,
     videosDescriptions: videos.map(({ description }) => description).join(','),
     imagesDescriptions: images.map(({ description }) => description).join(','),
+    thumbnailImage: images.find(({ is_thumbnail }) => is_thumbnail)?.url_standard,
   };
 }
 
