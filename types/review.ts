@@ -1,7 +1,7 @@
 export interface Review {
   title: string;
   text: string;
-  status: string;
+  status: 'approved' | 'pending' | 'disapproved';
   rating: number;
   email: string;
   name: string;
