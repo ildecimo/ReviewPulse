@@ -1,70 +1,18 @@
 'use client';
 import { useMemo } from 'react';
-import { Table, Badge, Link, Box, H1 } from '@bigcommerce/big-design';
+import { Table, Link, Box, H1 } from '@bigcommerce/big-design';
 import Image from 'next/image';
-import {
-  StarBorderIcon,
-  StarHalfIcon,
-  StarIcon,
-} from '@bigcommerce/big-design-icons';
 import { type Review, type Product } from 'types';
 import { convertToDateString } from '~/utils/utils';
+import { StarRating } from './StarRating';
+import { ReviewStatusBadge } from './ReviewStatusBadge';
 
 interface ProductReviewListProps {
   product: Product;
   reviews: Review[];
 }
 
-interface StatusBadgeProps {
-  status: 'approved' | 'pending' | 'disapproved';
-}
-
-interface ReviewRatingProps {
-  rating: number;
-}
-
-const StatusBadge = ({ status }: StatusBadgeProps) => {
-  const variant =
-    status === 'approved'
-      ? 'success'
-      : status === 'pending'
-      ? 'warning'
-      : 'danger';
-  const label = status.charAt(0).toUpperCase() + status.slice(1);
-
-  return (
-    <Badge label={label} variant={variant}>
-      {status}
-    </Badge>
-  );
-};
-
-const ReviewRating = ({ rating }: ReviewRatingProps) => {
-  const stars: React.JSX.Element[] = [];
-  const fullStars = Math.floor(rating);
-  const halfStars = Math.ceil(rating % 1);
-  const emptyStars = 5 - fullStars - halfStars;
-
-  for (let i = 0; i < fullStars; i++) {
-    stars.push(<StarIcon color="warning50" size={'medium'} key={i} />);
-  }
-
-  if (halfStars) {
-    stars.push(
-      <StarHalfIcon color="warning50" size={'medium'} key={fullStars} />
-    );
-  }
-
-  for (let i = 0; i < emptyStars; i++) {
-    stars.push(
-      <StarBorderIcon size={'medium'} key={fullStars + halfStars + i} />
-    );
-  }
-
-  return <div className="flex">{stars}</div>;
-};
-
-const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
+export const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
   const averageRating = useMemo(() => {
     return (
       reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
@@ -97,7 +45,7 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
             <div className="flex">
               <strong>Average Rating:</strong>
               <span className="pl-2">
-                <ReviewRating rating={averageRating} />
+                <StarRating rating={averageRating} />
               </span>
             </div>
             <div className="mt-4">
@@ -107,7 +55,7 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
             <div className="flex">
               <strong>Average Approved Rating:</strong>
               <span className="pl-2">
-                <ReviewRating rating={averageApprovedRating} />
+                <StarRating rating={averageApprovedRating} />
               </span>
             </div>
           </Box>
@@ -124,17 +72,18 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
             />
           </div>
         </div>
+        
         <Table
           columns={[
             {
               header: 'Rating',
               hash: 'rating',
-              render: ({ rating }) => <ReviewRating rating={rating} />,
+              render: ({ rating }) => <StarRating rating={rating} />,
             },
             {
               header: 'Status',
               hash: 'status',
-              render: ({ status }) => <StatusBadge status={status} />,
+              render: ({ status }) => <ReviewStatusBadge status={status} />,
             },
             {
               header: 'Posted by',
@@ -158,7 +107,7 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
               header: 'Action',
               hash: 'action',
               render: ({ id }) => (
-                <Link href={`/review/${id}`}>AI Explore</Link>
+                <Link href={`/productReview/${product.id}/review/${id}`}>AI Explore</Link>
               ),
             },
           ]}
@@ -169,5 +118,3 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
     </div>
   );
 };
-
-export default ProductReviewList;

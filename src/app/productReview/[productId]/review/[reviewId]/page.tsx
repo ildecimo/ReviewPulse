@@ -1,17 +1,18 @@
 import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
 
-import { fetchProductWithAttributes, fetchReviews } from '~/server/bigcommerce-api';
+import {
+  fetchProductWithAttributes,
+  fetchReview,
+} from '~/server/bigcommerce-api';
 
-import { ProductReviewList } from '~/components/ProductReviewList';
+import { ReviewDetail } from '~/components/ReviewDetail';
 
 interface PageProps {
-  params: { productId: string };
+  params: { reviewId: string; productId: string };
 }
 
 export default async function Page(props: PageProps) {
-  const { productId } = props.params;
-
   const authorized = authorize();
 
   if (!authorized) {
@@ -24,23 +25,23 @@ export default async function Page(props: PageProps) {
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
-  const id = Number(productId);
+  const reviewId = Number(props.params.reviewId);
+  const productId = Number(props.params.productId);
 
   const product = await fetchProductWithAttributes(
-    id,
+    productId,
     accessToken,
     authorized.storeHash
   );
 
-  const reviews = await fetchReviews(
-    id,
+  const review = await fetchReview(
+    productId,
+    reviewId,
     accessToken,
     authorized.storeHash
   );
 
   return (
-    <div>
-      <ProductReviewList product={product} reviews={reviews} />
-    </div>
+    <div><ReviewDetail product={product} review={review} /></div>
   );
 }
