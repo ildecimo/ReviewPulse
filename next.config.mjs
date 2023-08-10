@@ -18,6 +18,9 @@ const config = {
     locales: ['en'],
     defaultLocale: 'en',
   },
+  images: {
+    domains: ['cdn11.bigcommerce.com'],
+  },
 };
 
 export default config;
