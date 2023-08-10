@@ -61,3 +61,14 @@ export const prepareAiPromptAttributes = (
     product: includeProductAttributes ? product : null,
   };
 };
+
+export const convertToDateString = (date: string) => {
+  const dateObject = new Date(date);
+
+  return dateObject.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+  });
+}

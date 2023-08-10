@@ -26,6 +26,37 @@ const brandSchema = z.object({
   data: z.object({ name: z.string().optional() }),
 });
 
+const reviewSchema = z.object({
+  data: z.array(
+    z.object({
+      title: z.string(),
+      text: z.string(),
+      status: z.enum(['approved', 'pending', 'disapproved']),
+      rating: z.number(),
+      email: z.string(),
+      name: z.string(),
+      date_reviewed: z.string(),
+      id: z.number(),
+      date_created: z.string(),
+      date_modified: z.string(),
+    })
+  ),
+  meta: z.object({
+    pagination: z.object({
+      total: z.number(),
+      count: z.number(),
+      per_page: z.number(),
+      current_page: z.number(),
+      total_pages: z.number(),
+      links: z.object({
+        previous: z.string().optional(),
+        current: z.string(),
+        next: z.string().optional(),
+      }),
+    }),
+  }),
+});
+
 const fetchFromBigCommerceApi = (
   path: string,
   accessToken: string,
@@ -123,4 +154,32 @@ export async function fetchBrand(
   }
 
   return parsedBrand.data.data.name;
+}
+
+export async function fetchProductReviews(
+  productId: number,
+  accessToken: string,
+  storeHash: string
+) {
+  const response = await fetchFromBigCommerceApi(
+    `/catalog/products/${productId}/reviews`,
+    accessToken,
+    storeHash
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch reviews');
+  }
+
+  const parsedReviews = reviewSchema.safeParse(await response.json());
+
+  console.log(parsedReviews);
+
+  if (!parsedReviews.success) {
+    throw new Error('Failed to parse reviews');
+  }
+
+  console.log(parsedReviews);
+
+  return parsedReviews.data.data;
 }
