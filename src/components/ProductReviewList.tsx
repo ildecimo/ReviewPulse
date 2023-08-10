@@ -14,13 +14,10 @@ const ProductReviewList = ({
 }: ProductReviewListProps) => {
   return (
     <div>
-      <div
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        <H1>Reviews for - {productName}</H1>
-
+      <div>
+        <div className="text-center">
+          <H1>Reviews for - {productName}</H1>
+        </div>
         <Table
           columns={[
             { header: 'Name', hash: 'name', render: ({ name }) => name },
