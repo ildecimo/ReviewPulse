@@ -130,7 +130,7 @@ const ProductReviewList = ({
             {
               header: 'Action',
               hash: 'action',
-              render: ({id}) => <Link href={`/review/${id}`}>Analyze</Link>,
+              render: ({id}) => <Link href={`/review/${id}`}>AI Explore</Link>,
             }
           ]}
           items={reviews}
