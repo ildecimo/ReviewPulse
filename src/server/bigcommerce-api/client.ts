@@ -31,13 +31,12 @@ const reviewSchema = z.object({
     z.object({
       title: z.string(),
       text: z.string(),
-      status: z.string(),
+      status: z.enum(['approved', 'pending', 'disapproved']),
       rating: z.number(),
       email: z.string(),
       name: z.string(),
       date_reviewed: z.string(),
       id: z.number(),
-      // product_id: z.number(),
       date_created: z.string(),
       date_modified: z.string(),
     })
