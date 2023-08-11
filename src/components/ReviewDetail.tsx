@@ -20,7 +20,7 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
     <div>
       <div>
         <Breadcrumbs>
-          <Breadcrumbs.Link href="/">All Products</Breadcrumbs.Link>
+          <Breadcrumbs.Link href="/products">All Products</Breadcrumbs.Link>
           <Breadcrumbs.Divider />
           <Breadcrumbs.Link href={`/product/${product.id}`}>
             {product.name}
