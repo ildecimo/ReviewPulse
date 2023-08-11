@@ -1,11 +1,13 @@
 'use client';
-import { Link, Box, Tooltip } from '@bigcommerce/big-design';
+import { Link, Box, Tooltip, Button } from '@bigcommerce/big-design';
 import { type Review, type Product } from 'types';
 import { convertToDateString } from '~/utils/utils';
 import { StarRating } from './StarRating';
 import { ReviewStatusBadge } from './ReviewStatusBadge';
 import GaugeComponent from 'react-gauge-component';
 import { Card } from './Card';
+import classNames from 'classnames';
+import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
 
 interface ReviewDetailProps {
   product: Product;
@@ -22,7 +24,7 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
           Review #{product.id}
         </div>
 
-        <div className="my-12 grid grid-cols-2 gap-4">
+        <div className="my-12 grid sm:grid-cols-2 gap-4">
           <Card
             footer={
               review.text && (
@@ -48,18 +50,22 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
 
           <Card
             footer={
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div className="bg-gray-100/80 px-3 py-2 rounded-md">
-                  <p className="text-sm mb-1 text-gray-600">Total orders</p>
-                  <p className="text-2xl font-bold text-gray-800">17</p>
+                  <p className="text-sm mb-0.5 text-gray-600">Total orders</p>
+                  <p className="text-2xl font-semibold text-gray-800">17</p>
                 </div>
                 <div className="bg-gray-100/80 px-3 py-2 rounded-md">
-                  <p className="text-sm mb-1 text-gray-600">Total spendings</p>
-                  <p className="text-xl font-bold text-gray-800">$16430.00</p>
+                  <p className="text-sm mb-0.5 text-gray-600">
+                    Total spendings
+                  </p>
+                  <p className="text-xl font-semibold text-gray-800">
+                    $16430.00
+                  </p>
                 </div>
                 <div className="bg-gray-100/80 px-3 py-2 rounded-md">
-                  <p className="text-sm mb-1 text-gray-600">Total reviews</p>
-                  <p className="text-2xl font-bold text-gray-800">6</p>
+                  <p className="text-sm mb-0.5 text-gray-600">Total reviews</p>
+                  <p className="text-2xl font-semibold text-gray-800">6</p>
                 </div>
               </div>
             }
@@ -90,9 +96,9 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
         </div>
 
         <Box>
-          <div className="flex items-center space-x-6">
-            <div className="w-1/3">
-              <div className="aspect-square flex items-center justify-center bg-gray-50 rounded-lg">
+          <div className="space-y-6 md:flex items-center md:space-x-6">
+            <div className="md:w-1/3">
+              <div className="pb-4 md:pb-0 md:aspect-square flex items-center justify-center bg-gray-50 rounded-lg">
                 <GaugeComponent
                   labels={{
                     valueLabel: { hide: true },
@@ -101,24 +107,63 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
                       valueConfig: { hide: true },
                     },
                   }}
-                  arc={{ colorArray: ['#ea4228', '#f5cd19', '#5be12c'] }}
-                  pointer={{ type: 'blob', width: 20 }}
+                  arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
+                  pointer={{ type: 'needle', color: '#9ca3af' }}
                   type="semicircle"
-                  value={66}
+                  value={review.rating * 20}
                 />
               </div>
             </div>
-            <div className="w-2/3">
-              <h2 className="text-5xl font-bold text-yellow-400 mb-3">
-                Neutral
+
+            <div className="md:w-2/3">
+              <h2
+                // @todo: replace calc based on `review.rating` with AI result
+                className={classNames('text-3xl md:text-5xl font-bold mb-3', {
+                  'text-red-500': review.rating < 2,
+                  'text-yellow-300': review.rating >= 2 && review.rating < 4,
+                  'text-green-500': review.rating >= 4,
+                })}
+              >
+                {review.rating < 2 && 'Negative'}
+                {review.rating >= 2 && review.rating < 4 && 'Neutral'}
+                {review.rating >= 4 && 'Positive'}
               </h2>
 
-              <p className="text-xl text-gray-700">
+              <p className="text-xl text-gray-800">
                 AI: &quot;Suspendisse auctor eget sapien sit amet sagittis.
                 Pellentesque sagittis tortor magna, eu efficitur purus maximus
                 vel. Sed non odio dignissim, dignissim lectus ac, imperdiet
                 quam&quot;
               </p>
+
+              <div className="mt-8">
+                <h3 className="mt-0 text-lg text-gray-600 font-medium mb-3">
+                  Suggested Actions
+                </h3>
+
+                <div>
+                  <Button
+                    disabled={review.status === 'approved'}
+                    iconLeft={<CheckIcon className="w-6 h-6" />}
+                  >
+                    Approve
+                  </Button>
+
+                  <Button
+                    iconLeft={<HeartIcon className="w-6 h-6" />}
+                    variant="secondary"
+                  >
+                    Thank you email
+                  </Button>
+
+                  <Button
+                    iconLeft={<EnvelopeIcon className="w-6 h-6" />}
+                    variant="secondary"
+                  >
+                    Follow-up email
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </Box>
