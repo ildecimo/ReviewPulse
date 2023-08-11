@@ -3,13 +3,15 @@
 import { type SimpleProduct } from 'types';
 
 import { Badge, Table } from '@bigcommerce/big-design';
+import { ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
+import { useState } from 'react';
 
 import { Breadcrumbs } from '~/components/Breadcrumbs';
 import { NextLink } from '~/components/NextLink';
+import { ProductFilters } from '~/components/ProductFilters';
 import { StarRating } from '~/components/StarRating';
 
-import { ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import { convertToUDS } from '~/utils/utils';
 
 interface ProductListProps {
@@ -37,11 +39,19 @@ const ReviewsAverage = ({ product }: ReviewsAverageProps) => {
 };
 
 const ProductList = ({ products }: ProductListProps) => {
+  const [filteredProducts, setFilteredProducts] = useState(products);
+
   return (
     <div>
       <Breadcrumbs>
         <Breadcrumbs.Text>All Products</Breadcrumbs.Text>
       </Breadcrumbs>
+      <div className="my-6">
+        <ProductFilters
+          products={products}
+          setFilteredProducts={setFilteredProducts}
+        />
+      </div>
       <div className="mt-10">
         <Table
           stickyHeader
@@ -112,7 +122,7 @@ const ProductList = ({ products }: ProductListProps) => {
               ),
             },
           ]}
-          items={products}
+          items={filteredProducts}
         />
       </div>
     </div>
