@@ -43,7 +43,7 @@ export const ProductReviewList = ({
     <div>
       <div>
         <Breadcrumbs>
-          <Breadcrumbs.Link href="/">All Products</Breadcrumbs.Link>
+          <Breadcrumbs.Link href="/products">All Products</Breadcrumbs.Link>
           <Breadcrumbs.Divider />
           <Breadcrumbs.Text>{product.name}</Breadcrumbs.Text>
         </Breadcrumbs>

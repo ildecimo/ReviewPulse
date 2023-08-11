@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import { z } from 'zod';
 import { env } from 'src/env.mjs';
+import { z } from 'zod';
+import { AUTH_COOKIE_NAME } from '~/constants';
 
 const jwtPayloadSchema = z.object({
   storeUser: z.number(),
@@ -9,7 +10,7 @@ const jwtPayloadSchema = z.object({
 });
 
 export function authorize() {
-  const token = cookies().get('ai-app-foundation-token');
+  const token = cookies().get(AUTH_COOKIE_NAME);
 
   if (!token) {
     return null;

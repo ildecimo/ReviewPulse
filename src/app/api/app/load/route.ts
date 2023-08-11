@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
-import { z } from 'zod';
 import { NextResponse, type NextRequest } from 'next/server';
+import { z } from 'zod';
+import { AUTH_COOKIE_NAME } from '~/constants';
 import { env } from '~/env.mjs';
 
 const queryParamSchema = z.object({
@@ -60,7 +61,7 @@ export function GET(request: NextRequest) {
     status: 302,
     statusText: 'Found',
     headers: {
-      'set-cookie': `ai-app-foundation-token=${clientToken}; SameSite=None; Secure; Path=/; Partitioned; HttpOnly; Max-Age=3600;`,
+      'set-cookie': `${AUTH_COOKIE_NAME}=${clientToken}; SameSite=None; Secure; Path=/; Partitioned; HttpOnly; Max-Age=3600;`,
     },
   });
 }
