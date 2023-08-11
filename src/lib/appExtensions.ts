@@ -165,7 +165,7 @@ const createReviewsAppExtensionMutation = () => ({
     input: {
       context: 'PANEL',
       model: 'PRODUCTS',
-      url: '/productReview/${id}',
+      url: '/product/${id}',
       label: {
         defaultValue: 'Product Review AI',
         locales: [

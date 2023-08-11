@@ -1,14 +1,17 @@
 'use client';
+import { type Product, type Review } from 'types';
+
 import { Table } from '@bigcommerce/big-design';
 import { BoltIcon } from '@heroicons/react/20/solid';
-import Link from 'next/link';
 import { useMemo } from 'react';
-import { type Product, type Review } from 'types';
+
+import { Breadcrumbs } from '~/components/Breadcrumbs';
+import { Card } from '~/components/Card';
+import { NextLink } from '~/components/NextLink';
+import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
+import { StarRating } from '~/components/StarRating';
+
 import { convertToDateString } from '~/utils/utils';
-import { Breadcrumbs } from './Breadcrumbs';
-import { Card } from './Card';
-import { ReviewStatusBadge } from './ReviewStatusBadge';
-import { StarRating } from './StarRating';
 
 interface ProductReviewListProps {
   product: Product;
@@ -128,12 +131,9 @@ export const ProductReviewList = ({
               header: 'Action',
               hash: 'action',
               render: ({ id }) => (
-                <Link
-                  className="inline-flex items-center whitespace-nowrap text-blue-700 hover:text-blue-900"
-                  href={`/productReview/${product.id}/review/${id}`}
-                >
+                <NextLink href={`/product/${product.id}/review/${id}`}>
                   AI Explore <BoltIcon className="ml-1 h-4 w-4" />
-                </Link>
+                </NextLink>
               ),
             },
           ]}

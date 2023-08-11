@@ -1,10 +1,11 @@
-import { type Product, type Review } from 'types';
+import { type Product, type Review, type SimpleProduct } from 'types';
 import {
-  fetchProduct,
-  fetchCategories,
   fetchBrand,
-  fetchProductReviews,
+  fetchCategories,
+  fetchProduct,
   fetchProductReview,
+  fetchProductReviews,
+  fetchProducts,
 } from './client';
 
 export const fetchProductWithAttributes = async (
@@ -54,4 +55,13 @@ export const fetchReview = async (
   );
 
   return review;
+};
+
+export const fetchAllProducts = async (
+  accessToken: string,
+  storeHash: string
+): Promise<SimpleProduct[]> => {
+  const products = await fetchProducts(accessToken, storeHash);
+
+  return products;
 };
