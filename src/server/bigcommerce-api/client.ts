@@ -11,11 +11,47 @@ const productSchema = z.object({
     width: z.number(),
     depth: z.number(),
     videos: z.array(z.object({ description: z.string() })),
-    images: z.array(z.object({ description: z.string(), url_standard: z.string(), is_thumbnail: z.boolean() })),
+    images: z.array(
+      z.object({
+        description: z.string(),
+        url_standard: z.string(),
+        is_thumbnail: z.boolean(),
+      })
+    ),
     custom_fields: z.array(z.object({ name: z.string(), value: z.string() })),
     brand_id: z.number().optional(),
     categories: z.array(z.number()),
   }),
+});
+
+const productsSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      type: z.string(),
+      condition: z.string(),
+      weight: z.number(),
+      height: z.number(),
+      width: z.number(),
+      depth: z.number(),
+      reviews_rating_sum: z.number(),
+      reviews_count: z.number(),
+      total_sold: z.number(),
+      is_visible: z.boolean(),
+      videos: z.array(z.object({ description: z.string() })),
+      images: z.array(
+        z.object({
+          description: z.string(),
+          url_standard: z.string(),
+          is_thumbnail: z.boolean(),
+        })
+      ),
+      custom_fields: z.array(z.object({ name: z.string(), value: z.string() })),
+      brand_id: z.number().optional(),
+      categories: z.array(z.number()),
+    })
+  ),
 });
 
 const categorySchema = z.object({
@@ -37,12 +73,12 @@ const reviewObjectSchema = z.object({
   id: z.number(),
   date_created: z.string(),
   date_modified: z.string(),
-})
+});
 
 const reviewSchema = z.object({
   data: reviewObjectSchema,
-  meta: z.object({})
-})
+  meta: z.object({}),
+});
 
 const reviewsSchema = z.object({
   data: z.array(reviewObjectSchema),
@@ -107,7 +143,8 @@ export async function fetchProduct(
     ...restAttr,
     videosDescriptions: videos.map(({ description }) => description).join(','),
     imagesDescriptions: images.map(({ description }) => description).join(','),
-    thumbnailImage: images.find(({ is_thumbnail }) => is_thumbnail)?.url_standard,
+    thumbnailImage: images.find(({ is_thumbnail }) => is_thumbnail)
+      ?.url_standard,
   };
 }
 
@@ -208,5 +245,43 @@ export async function fetchProductReview(
     throw new Error('Failed to parse review');
   }
 
-  return parsedReview.data.data
+  return parsedReview.data.data;
+}
+
+export async function fetchProducts(accessToken: string, storeHash: string) {
+  const params = new URLSearchParams({
+    include: 'videos,images,custom_fields',
+  }).toString();
+
+  const response = await fetchFromBigCommerceApi(
+    `/catalog/products?${params}`,
+    accessToken,
+    storeHash
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch products');
+  }
+
+  const parsedProducts = productsSchema.safeParse(await response.json());
+
+  if (!parsedProducts.success) {
+    throw new Error('Failed to parse products');
+  }
+
+  const cleanProducts = parsedProducts.data.data.map(
+    ({ videos, images, ...restAttr }) => ({
+      ...restAttr,
+      videosDescriptions: videos
+        .map(({ description }) => description)
+        .join(','),
+      imagesDescriptions: images
+        .map(({ description }) => description)
+        .join(','),
+      thumbnailImage: images.find(({ is_thumbnail }) => is_thumbnail)
+        ?.url_standard,
+    })
+  );
+
+  return cleanProducts;
 }
