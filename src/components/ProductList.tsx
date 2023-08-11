@@ -2,7 +2,10 @@
 
 import { type SimpleProduct } from 'types';
 
+import { Table } from '@bigcommerce/big-design';
+
 import { Breadcrumbs } from '~/components/Breadcrumbs';
+import { NextLink } from '~/components/NextLink';
 
 interface ProductListProps {
   products: SimpleProduct[];

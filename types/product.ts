@@ -4,6 +4,7 @@ export interface NewProduct {
 }
 
 export interface SimpleProduct extends NewProduct {
+  id: number;
   type: string;
   condition: string;
   weight: number;
