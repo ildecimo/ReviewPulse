@@ -42,7 +42,7 @@ export const Card = ({
 );
 
 const CardTitle = ({ children }: { children: React.ReactNode }) => (
-  <h1 className="text-base m-0">{children}</h1>
+  <h1 className="text-base font-semibold m-0">{children}</h1>
 );
 
 const CardSubtitle = ({ children }: { children: React.ReactNode }) => (

@@ -1,18 +1,24 @@
 'use client';
 import { useMemo } from 'react';
-import { Table, Link, Box, H1 } from '@bigcommerce/big-design';
-import Image from 'next/image';
+import { Table } from '@bigcommerce/big-design';
+import Link from 'next/link';
+import { BoltIcon } from '@heroicons/react/20/solid';
 import { type Review, type Product } from 'types';
 import { convertToDateString } from '~/utils/utils';
 import { StarRating } from './StarRating';
 import { ReviewStatusBadge } from './ReviewStatusBadge';
+import { Card } from './Card';
+import { Breadcrumbs } from './Breadcrumbs';
 
 interface ProductReviewListProps {
   product: Product;
   reviews: Review[];
 }
 
-export const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
+export const ProductReviewList = ({
+  product,
+  reviews,
+}: ProductReviewListProps) => {
   const averageRating = useMemo(() => {
     return (
       reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
@@ -33,46 +39,61 @@ export const ProductReviewList = ({ product, reviews }: ProductReviewListProps) 
   return (
     <div>
       <div>
-        <div>
-          <Link href="/">All Products</Link> / {product.name}
-        </div>
-        <div className="my-12 flex justify-between items-end flex-wrap">
-          <Box border="box" padding="small" borderRadius="normal">
-            <div>
-              <strong>Reviews:</strong>
-              <span className="pl-2">{reviews.length}</span>
-            </div>
-            <div className="flex">
-              <strong>Average Rating:</strong>
-              <span className="pl-2">
-                <StarRating rating={averageRating} />
-              </span>
-            </div>
-            <div className="mt-4">
-              <strong>Approved:</strong>
-              <span className="pl-2">{approvedReviews.length}</span>
-            </div>
-            <div className="flex">
-              <strong>Average Approved Rating:</strong>
-              <span className="pl-2">
-                <StarRating rating={averageApprovedRating} />
-              </span>
-            </div>
-          </Box>
+        <Breadcrumbs>
+          <Breadcrumbs.Link href="/">All Products</Breadcrumbs.Link>
+          <Breadcrumbs.Divider />
+          <Breadcrumbs.Text>{product.name}</Breadcrumbs.Text>
+        </Breadcrumbs>
 
-          <div>
-            <H1>
-              <strong>{product.name}</strong>
-            </H1>
-            <Image
-              src={product.thumbnailImage}
-              alt={product.name}
-              width={300}
-              height={300}
-            />
-          </div>
+        <div className="my-6">
+          <Card
+            image={{ alt: product.name, src: product.thumbnailImage }}
+            topContent={
+              <>
+                <Card.Title>{product.name}</Card.Title>
+
+                <div className="space-y-2 mt-2">
+                  <div className="md:flex md:space-x-4">
+                    <div>
+                      <strong className="font-semibold text-gray-600">
+                        Reviews:
+                      </strong>
+                      <span className="pl-2">{reviews.length}</span>
+                    </div>
+
+                    <div className="flex">
+                      <strong className="font-semibold text-gray-600">
+                        Average Rating:
+                      </strong>
+                      <span className="pl-2">
+                        <StarRating rating={averageRating} />
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="md:flex md:space-x-4">
+                    <div className="">
+                      <strong className="font-semibold text-gray-600">
+                        Approved:
+                      </strong>
+                      <span className="pl-2">{approvedReviews.length}</span>
+                    </div>
+
+                    <div className="flex">
+                      <strong className="font-semibold text-gray-600">
+                        Average Approved Rating:
+                      </strong>
+                      <span className="pl-2">
+                        <StarRating rating={averageApprovedRating} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            }
+          />
         </div>
-        
+
         <Table
           columns={[
             {
@@ -107,7 +128,12 @@ export const ProductReviewList = ({ product, reviews }: ProductReviewListProps) 
               header: 'Action',
               hash: 'action',
               render: ({ id }) => (
-                <Link href={`/productReview/${product.id}/review/${id}`}>AI Explore</Link>
+                <Link
+                  className="inline-flex whitespace-nowrap items-center text-blue-700 hover:text-blue-900"
+                  href={`/productReview/${product.id}/review/${id}`}
+                >
+                  AI Explore <BoltIcon className="w-4 h-4 ml-1" />
+                </Link>
               ),
             },
           ]}

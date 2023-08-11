@@ -1,5 +1,5 @@
 'use client';
-import { Link, Box, Tooltip, Button } from '@bigcommerce/big-design';
+import { Box, Tooltip, Button } from '@bigcommerce/big-design';
 import { type Review, type Product } from 'types';
 import { convertToDateString } from '~/utils/utils';
 import { StarRating } from './StarRating';
@@ -8,6 +8,7 @@ import GaugeComponent from 'react-gauge-component';
 import { Card } from './Card';
 import classNames from 'classnames';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
+import { Breadcrumbs } from './Breadcrumbs';
 
 interface ReviewDetailProps {
   product: Product;
@@ -18,13 +19,17 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
   return (
     <div>
       <div>
-        <div>
-          <Link href="/">All Products</Link> /{' '}
-          <Link href={`/productReview/${product.id}`}>{product.name}</Link> /
-          Review #{product.id}
-        </div>
+        <Breadcrumbs>
+          <Breadcrumbs.Link href="/">All Products</Breadcrumbs.Link>
+          <Breadcrumbs.Divider />
+          <Breadcrumbs.Link href={`/productReview/${product.id}`}>
+            {product.name}
+          </Breadcrumbs.Link>
+          <Breadcrumbs.Divider />
+          <Breadcrumbs.Text>Review #{review.id}</Breadcrumbs.Text>
+        </Breadcrumbs>
 
-        <div className="my-12 grid sm:grid-cols-2 gap-4">
+        <div className="my-6 grid sm:grid-cols-2 gap-4">
           <Card
             footer={
               review.text && (
