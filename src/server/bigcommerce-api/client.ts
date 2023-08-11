@@ -39,6 +39,7 @@ const productsSchema = z.object({
       reviews_count: z.number(),
       total_sold: z.number(),
       is_visible: z.boolean(),
+      price: z.number(),
       videos: z.array(z.object({ description: z.string() })),
       images: z.array(
         z.object({

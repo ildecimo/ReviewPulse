@@ -11,6 +11,7 @@ export interface SimpleProduct extends NewProduct {
   height: number;
   width: number;
   depth: number;
+  price: number;
   videosDescriptions: string;
   imagesDescriptions: string;
   thumbnailImage: string | undefined;
