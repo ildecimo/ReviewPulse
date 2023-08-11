@@ -1,70 +1,24 @@
 'use client';
+import { Table } from '@bigcommerce/big-design';
+import { BoltIcon } from '@heroicons/react/20/solid';
+import Link from 'next/link';
 import { useMemo } from 'react';
-import { Table, Badge, Link, Box, H1 } from '@bigcommerce/big-design';
-import Image from 'next/image';
-import {
-  StarBorderIcon,
-  StarHalfIcon,
-  StarIcon,
-} from '@bigcommerce/big-design-icons';
-import { type Review, type Product } from 'types';
+import { type Product, type Review } from 'types';
 import { convertToDateString } from '~/utils/utils';
+import { Breadcrumbs } from './Breadcrumbs';
+import { Card } from './Card';
+import { ReviewStatusBadge } from './ReviewStatusBadge';
+import { StarRating } from './StarRating';
 
 interface ProductReviewListProps {
   product: Product;
   reviews: Review[];
 }
 
-interface StatusBadgeProps {
-  status: 'approved' | 'pending' | 'disapproved';
-}
-
-interface ReviewRatingProps {
-  rating: number;
-}
-
-const StatusBadge = ({ status }: StatusBadgeProps) => {
-  const variant =
-    status === 'approved'
-      ? 'success'
-      : status === 'pending'
-      ? 'warning'
-      : 'danger';
-  const label = status.charAt(0).toUpperCase() + status.slice(1);
-
-  return (
-    <Badge label={label} variant={variant}>
-      {status}
-    </Badge>
-  );
-};
-
-const ReviewRating = ({ rating }: ReviewRatingProps) => {
-  const stars: React.JSX.Element[] = [];
-  const fullStars = Math.floor(rating);
-  const halfStars = Math.ceil(rating % 1);
-  const emptyStars = 5 - fullStars - halfStars;
-
-  for (let i = 0; i < fullStars; i++) {
-    stars.push(<StarIcon color="warning50" size={'medium'} key={i} />);
-  }
-
-  if (halfStars) {
-    stars.push(
-      <StarHalfIcon color="warning50" size={'medium'} key={fullStars} />
-    );
-  }
-
-  for (let i = 0; i < emptyStars; i++) {
-    stars.push(
-      <StarBorderIcon size={'medium'} key={fullStars + halfStars + i} />
-    );
-  }
-
-  return <div className="flex">{stars}</div>;
-};
-
-const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
+export const ProductReviewList = ({
+  product,
+  reviews,
+}: ProductReviewListProps) => {
   const averageRating = useMemo(() => {
     return (
       reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
@@ -85,56 +39,72 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
   return (
     <div>
       <div>
-        <div>
-          <Link href="/">All Products</Link> / {product.name}
-        </div>
-        <div className="my-12 flex justify-between items-end flex-wrap">
-          <Box border="box" padding="small" borderRadius="normal">
-            <div>
-              <strong>Reviews:</strong>
-              <span className="pl-2">{reviews.length}</span>
-            </div>
-            <div className="flex">
-              <strong>Average Rating:</strong>
-              <span className="pl-2">
-                <ReviewRating rating={averageRating} />
-              </span>
-            </div>
-            <div className="mt-4">
-              <strong>Approved:</strong>
-              <span className="pl-2">{approvedReviews.length}</span>
-            </div>
-            <div className="flex">
-              <strong>Average Approved Rating:</strong>
-              <span className="pl-2">
-                <ReviewRating rating={averageApprovedRating} />
-              </span>
-            </div>
-          </Box>
+        <Breadcrumbs>
+          <Breadcrumbs.Link href="/">All Products</Breadcrumbs.Link>
+          <Breadcrumbs.Divider />
+          <Breadcrumbs.Text>{product.name}</Breadcrumbs.Text>
+        </Breadcrumbs>
 
-          <div>
-            <H1>
-              <strong>{product.name}</strong>
-            </H1>
-            <Image
-              src={product.thumbnailImage}
-              alt={product.name}
-              width={300}
-              height={300}
-            />
-          </div>
+        <div className="my-6">
+          <Card
+            image={{ alt: product.name, src: product.thumbnailImage }}
+            topContent={
+              <>
+                <Card.Title>{product.name}</Card.Title>
+
+                <div className="mt-2 space-y-2">
+                  <div className="md:flex md:space-x-4">
+                    <div>
+                      <strong className="font-semibold text-gray-600">
+                        Reviews:
+                      </strong>
+                      <span className="pl-2">{reviews.length}</span>
+                    </div>
+
+                    <div className="flex">
+                      <strong className="font-semibold text-gray-600">
+                        Average Rating:
+                      </strong>
+                      <span className="pl-2">
+                        <StarRating rating={averageRating} />
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="md:flex md:space-x-4">
+                    <div className="">
+                      <strong className="font-semibold text-gray-600">
+                        Approved:
+                      </strong>
+                      <span className="pl-2">{approvedReviews.length}</span>
+                    </div>
+
+                    <div className="flex">
+                      <strong className="font-semibold text-gray-600">
+                        Average Approved Rating:
+                      </strong>
+                      <span className="pl-2">
+                        <StarRating rating={averageApprovedRating} />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            }
+          />
         </div>
+
         <Table
           columns={[
             {
               header: 'Rating',
               hash: 'rating',
-              render: ({ rating }) => <ReviewRating rating={rating} />,
+              render: ({ rating }) => <StarRating rating={rating} />,
             },
             {
               header: 'Status',
               hash: 'status',
-              render: ({ status }) => <StatusBadge status={status} />,
+              render: ({ status }) => <ReviewStatusBadge status={status} />,
             },
             {
               header: 'Posted by',
@@ -158,7 +128,12 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
               header: 'Action',
               hash: 'action',
               render: ({ id }) => (
-                <Link href={`/review/${id}`}>AI Explore</Link>
+                <Link
+                  className="inline-flex items-center whitespace-nowrap text-blue-700 hover:text-blue-900"
+                  href={`/productReview/${product.id}/review/${id}`}
+                >
+                  AI Explore <BoltIcon className="ml-1 h-4 w-4" />
+                </Link>
               ),
             },
           ]}
@@ -169,5 +144,3 @@ const ProductReviewList = ({ product, reviews }: ProductReviewListProps) => {
     </div>
   );
 };
-
-export default ProductReviewList;

@@ -4,6 +4,7 @@ import {
   fetchCategories,
   fetchBrand,
   fetchProductReviews,
+  fetchProductReview,
 } from './client';
 
 export const fetchProductWithAttributes = async (
@@ -30,11 +31,27 @@ export const fetchProductWithAttributes = async (
 };
 
 export const fetchReviews = async (
-  id: number,
+  productId: number,
   accessToken: string,
   storeHash: string
 ): Promise<Review[]> => {
-  const reviews = await fetchProductReviews(id, accessToken, storeHash);
+  const reviews = await fetchProductReviews(productId, accessToken, storeHash);
 
   return reviews;
+};
+
+export const fetchReview = async (
+  productId: number,
+  reviewId: number,
+  accessToken: string,
+  storeHash: string
+): Promise<Review> => {
+  const review = await fetchProductReview(
+    productId,
+    reviewId,
+    accessToken,
+    storeHash
+  );
+
+  return review;
 };

@@ -26,21 +26,26 @@ const brandSchema = z.object({
   data: z.object({ name: z.string().optional() }),
 });
 
+const reviewObjectSchema = z.object({
+  title: z.string(),
+  text: z.string(),
+  status: z.enum(['approved', 'pending', 'disapproved']),
+  rating: z.number(),
+  email: z.string(),
+  name: z.string(),
+  date_reviewed: z.string(),
+  id: z.number(),
+  date_created: z.string(),
+  date_modified: z.string(),
+})
+
 const reviewSchema = z.object({
-  data: z.array(
-    z.object({
-      title: z.string(),
-      text: z.string(),
-      status: z.enum(['approved', 'pending', 'disapproved']),
-      rating: z.number(),
-      email: z.string(),
-      name: z.string(),
-      date_reviewed: z.string(),
-      id: z.number(),
-      date_created: z.string(),
-      date_modified: z.string(),
-    })
-  ),
+  data: reviewObjectSchema,
+  meta: z.object({})
+})
+
+const reviewsSchema = z.object({
+  data: z.array(reviewObjectSchema),
   meta: z.object({
     pagination: z.object({
       total: z.number(),
@@ -172,15 +177,36 @@ export async function fetchProductReviews(
     throw new Error('Failed to fetch reviews');
   }
 
-  const parsedReviews = reviewSchema.safeParse(await response.json());
-
-  console.log(parsedReviews);
+  const parsedReviews = reviewsSchema.safeParse(await response.json());
 
   if (!parsedReviews.success) {
     throw new Error('Failed to parse reviews');
   }
 
-  console.log(parsedReviews);
-
   return parsedReviews.data.data;
+}
+
+export async function fetchProductReview(
+  productId: number,
+  reviewId: number,
+  accessToken: string,
+  storeHash: string
+) {
+  const response = await fetchFromBigCommerceApi(
+    `/catalog/products/${productId}/reviews/${reviewId}`,
+    accessToken,
+    storeHash
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch review');
+  }
+
+  const parsedReview = reviewSchema.safeParse(await response.json());
+
+  if (!parsedReview.success) {
+    throw new Error('Failed to parse review');
+  }
+
+  return parsedReview.data.data
 }

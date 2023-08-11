@@ -19,7 +19,7 @@ const config = {
     defaultLocale: 'en',
   },
   images: {
-    domains: ['cdn11.bigcommerce.com'],
+    domains: ['cdn11.bigcommerce.com', 'unavatar.io'],
   },
 };
 
