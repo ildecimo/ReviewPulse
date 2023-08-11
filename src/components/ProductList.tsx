@@ -9,14 +9,18 @@ import { Breadcrumbs } from '~/components/Breadcrumbs';
 import { NextLink } from '~/components/NextLink';
 import { StarRating } from '~/components/StarRating';
 
-import { BoltIcon } from '@heroicons/react/20/solid';
+import { ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import { convertToUDS } from '~/utils/utils';
 
 interface ProductListProps {
   products: SimpleProduct[];
 }
 
-const generateReviewsAverage = (product: SimpleProduct) => {
+interface ReviewsAverageProps {
+  product: SimpleProduct;
+}
+
+const ReviewsAverage = ({ product }: ReviewsAverageProps) => {
   const { reviews_count, reviews_rating_sum } = product;
 
   if (reviews_count === 0) {
@@ -96,14 +100,14 @@ const ProductList = ({ products }: ProductListProps) => {
             {
               header: 'Approved Rating',
               hash: 'approvedRating',
-              render: (product) => generateReviewsAverage(product),
+              render: (product) => <ReviewsAverage product={product} />,
             },
             {
               header: 'Action',
               hash: 'action',
               render: (product) => (
                 <NextLink href={`/productReview/${product.id}`}>
-                  AI Explore <BoltIcon className="ml-1 h-4 w-4" />
+                  Explore <ArrowLongRightIcon className="ml-1 h-4 w-4" />
                 </NextLink>
               ),
             },
