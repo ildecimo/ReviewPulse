@@ -15,9 +15,9 @@ export const Card = ({
   topRightContent,
 }: CardProps) => (
   <Box border="box" padding="small" borderRadius="normal">
-    <div className="space-y-3 h-full flex flex-col">
+    <div className="flex h-full flex-col space-y-3">
       <div className="flex">
-        <div className="relative w-16 h-16 rounded-md overflow-hidden mr-3">
+        <div className="relative mr-3 h-16 w-16 overflow-hidden rounded-md">
           <Image
             {...image}
             alt={image.alt}
@@ -42,11 +42,11 @@ export const Card = ({
 );
 
 const CardTitle = ({ children }: { children: React.ReactNode }) => (
-  <h1 className="text-base font-semibold m-0">{children}</h1>
+  <h1 className="m-0 text-base font-semibold">{children}</h1>
 );
 
 const CardSubtitle = ({ children }: { children: React.ReactNode }) => (
-  <p className="text-sm text-gray-400 mt-0.5">{children}</p>
+  <p className="mt-0.5 text-sm text-gray-400">{children}</p>
 );
 
 Card.Title = CardTitle;

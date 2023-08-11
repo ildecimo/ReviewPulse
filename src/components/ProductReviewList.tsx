@@ -1,14 +1,14 @@
 'use client';
-import { useMemo } from 'react';
 import { Table } from '@bigcommerce/big-design';
-import Link from 'next/link';
 import { BoltIcon } from '@heroicons/react/20/solid';
-import { type Review, type Product } from 'types';
+import Link from 'next/link';
+import { useMemo } from 'react';
+import { type Product, type Review } from 'types';
 import { convertToDateString } from '~/utils/utils';
-import { StarRating } from './StarRating';
-import { ReviewStatusBadge } from './ReviewStatusBadge';
-import { Card } from './Card';
 import { Breadcrumbs } from './Breadcrumbs';
+import { Card } from './Card';
+import { ReviewStatusBadge } from './ReviewStatusBadge';
+import { StarRating } from './StarRating';
 
 interface ProductReviewListProps {
   product: Product;
@@ -52,7 +52,7 @@ export const ProductReviewList = ({
               <>
                 <Card.Title>{product.name}</Card.Title>
 
-                <div className="space-y-2 mt-2">
+                <div className="mt-2 space-y-2">
                   <div className="md:flex md:space-x-4">
                     <div>
                       <strong className="font-semibold text-gray-600">
@@ -129,10 +129,10 @@ export const ProductReviewList = ({
               hash: 'action',
               render: ({ id }) => (
                 <Link
-                  className="inline-flex whitespace-nowrap items-center text-blue-700 hover:text-blue-900"
+                  className="inline-flex items-center whitespace-nowrap text-blue-700 hover:text-blue-900"
                   href={`/productReview/${product.id}/review/${id}`}
                 >
-                  AI Explore <BoltIcon className="w-4 h-4 ml-1" />
+                  AI Explore <BoltIcon className="ml-1 h-4 w-4" />
                 </Link>
               ),
             },

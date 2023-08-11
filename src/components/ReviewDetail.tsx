@@ -1,14 +1,14 @@
 'use client';
-import { Box, Tooltip, Button } from '@bigcommerce/big-design';
-import { type Review, type Product } from 'types';
-import { convertToDateString } from '~/utils/utils';
-import { StarRating } from './StarRating';
-import { ReviewStatusBadge } from './ReviewStatusBadge';
-import GaugeComponent from 'react-gauge-component';
-import { Card } from './Card';
-import classNames from 'classnames';
+import { Box, Button, Tooltip } from '@bigcommerce/big-design';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
+import classNames from 'classnames';
+import GaugeComponent from 'react-gauge-component';
+import { type Product, type Review } from 'types';
+import { convertToDateString } from '~/utils/utils';
 import { Breadcrumbs } from './Breadcrumbs';
+import { Card } from './Card';
+import { ReviewStatusBadge } from './ReviewStatusBadge';
+import { StarRating } from './StarRating';
 
 interface ReviewDetailProps {
   product: Product;
@@ -29,11 +29,11 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
           <Breadcrumbs.Text>Review #{review.id}</Breadcrumbs.Text>
         </Breadcrumbs>
 
-        <div className="my-6 grid sm:grid-cols-2 gap-4">
+        <div className="my-6 grid gap-4 sm:grid-cols-2">
           <Card
             footer={
               review.text && (
-                <div className="bg-gray-100/80 text-gray-800 text-lg px-3 py-2 rounded-md flex-1">
+                <div className="flex-1 rounded-md bg-gray-100/80 px-3 py-2 text-lg text-gray-800">
                   {review.text}
                 </div>
               )
@@ -55,21 +55,21 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
 
           <Card
             footer={
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <div className="bg-gray-100/80 px-3 py-2 rounded-md">
-                  <p className="text-sm mb-0.5 text-gray-600">Total orders</p>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                <div className="rounded-md bg-gray-100/80 px-3 py-2">
+                  <p className="mb-0.5 text-sm text-gray-600">Total orders</p>
                   <p className="text-2xl font-semibold text-gray-800">17</p>
                 </div>
-                <div className="bg-gray-100/80 px-3 py-2 rounded-md">
-                  <p className="text-sm mb-0.5 text-gray-600">
+                <div className="rounded-md bg-gray-100/80 px-3 py-2">
+                  <p className="mb-0.5 text-sm text-gray-600">
                     Total spendings
                   </p>
                   <p className="text-xl font-semibold text-gray-800">
                     $16430.00
                   </p>
                 </div>
-                <div className="bg-gray-100/80 px-3 py-2 rounded-md">
-                  <p className="text-sm mb-0.5 text-gray-600">Total reviews</p>
+                <div className="rounded-md bg-gray-100/80 px-3 py-2">
+                  <p className="mb-0.5 text-sm text-gray-600">Total reviews</p>
                   <p className="text-2xl font-semibold text-gray-800">6</p>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
               <Tooltip
                 placement="bottom"
                 trigger={
-                  <div className="cursor-help bg-green-200/80 text-green-800 w-9 aspect-square flex items-center justify-center rounded-full font-semibold">
+                  <div className="flex aspect-square w-9 cursor-help items-center justify-center rounded-full bg-green-200/80 font-semibold text-green-800">
                     92
                   </div>
                 }
@@ -101,9 +101,9 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
         </div>
 
         <Box>
-          <div className="space-y-6 md:flex items-center md:space-x-6">
+          <div className="items-center space-y-6 md:flex md:space-x-6">
             <div className="md:w-1/3">
-              <div className="pb-4 md:pb-0 md:aspect-square flex items-center justify-center bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-center rounded-lg bg-gray-50 pb-4 md:aspect-square md:pb-0">
                 <GaugeComponent
                   labels={{
                     valueLabel: { hide: true },
@@ -123,7 +123,7 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
             <div className="md:w-2/3">
               <h2
                 // @todo: replace calc based on `review.rating` with AI result
-                className={classNames('text-3xl md:text-5xl font-bold mb-3', {
+                className={classNames('mb-3 text-3xl font-bold md:text-5xl', {
                   'text-red-500': review.rating < 2,
                   'text-yellow-300': review.rating >= 2 && review.rating < 4,
                   'text-green-500': review.rating >= 4,
@@ -142,27 +142,27 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
               </p>
 
               <div className="mt-8">
-                <h3 className="mt-0 text-lg text-gray-600 font-medium mb-3">
+                <h3 className="mb-3 mt-0 text-lg font-medium text-gray-600">
                   Suggested Actions
                 </h3>
 
                 <div>
                   <Button
                     disabled={review.status === 'approved'}
-                    iconLeft={<CheckIcon className="w-6 h-6" />}
+                    iconLeft={<CheckIcon className="h-6 w-6" />}
                   >
                     Approve
                   </Button>
 
                   <Button
-                    iconLeft={<HeartIcon className="w-6 h-6" />}
+                    iconLeft={<HeartIcon className="h-6 w-6" />}
                     variant="secondary"
                   >
                     Thank you email
                   </Button>
 
                   <Button
-                    iconLeft={<EnvelopeIcon className="w-6 h-6" />}
+                    iconLeft={<EnvelopeIcon className="h-6 w-6" />}
                     variant="secondary"
                   >
                     Follow-up email

@@ -6,7 +6,7 @@ interface BreadcrumbsProps {
 }
 
 export const Breadcrumbs = ({ children }: BreadcrumbsProps) => (
-  <div className="space-x-2 text-sm flex items-center">{children}</div>
+  <div className="flex items-center space-x-2 text-sm">{children}</div>
 );
 
 const BreadcrumbLink = (props: LinkProps & { children: React.ReactNode }) => (
@@ -15,7 +15,7 @@ const BreadcrumbLink = (props: LinkProps & { children: React.ReactNode }) => (
 
 const BreadcrumbDivider = () => (
   <span>
-    <ChevronDoubleRightIcon className="w-4 h-4 text-gray-500" />
+    <ChevronDoubleRightIcon className="h-4 w-4 text-gray-500" />
   </span>
 );
 
