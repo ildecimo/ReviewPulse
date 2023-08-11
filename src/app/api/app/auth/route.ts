@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
-import * as db from '~/lib/db';
+import { AUTH_COOKIE_NAME, BIGCOMMERCE_LOGIN_URL } from '~/constants';
 import { env } from '~/env.mjs';
 import { createAppExtension } from '~/lib/appExtensions';
-import { BIGCOMMERCE_LOGIN_URL } from '~/constants';
+import * as db from '~/lib/db';
 
 const queryParamSchema = z.object({
   code: z.string(),
@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
     status: 302,
     statusText: 'Found',
     headers: {
-      'set-cookie': `ai-app-foundation-token=${clientToken}; SameSite=None; Secure; Path=/; Partitioned; HttpOnly; Max-Age=3600;`,
+      'set-cookie': `${AUTH_COOKIE_NAME}=${clientToken}; SameSite=None; Secure; Path=/; Partitioned; HttpOnly; Max-Age=3600;`,
     },
   });
 }
