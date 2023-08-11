@@ -131,7 +131,7 @@ export const ProductReviewList = ({
               header: 'Action',
               hash: 'action',
               render: ({ id }) => (
-                <NextLink href={`/productReview/${product.id}/review/${id}`}>
+                <NextLink href={`/product/${product.id}/review/${id}`}>
                   AI Explore <BoltIcon className="ml-1 h-4 w-4" />
                 </NextLink>
               ),

@@ -106,7 +106,7 @@ const ProductList = ({ products }: ProductListProps) => {
               header: 'Action',
               hash: 'action',
               render: (product) => (
-                <NextLink href={`/productReview/${product.id}`}>
+                <NextLink href={`/product/${product.id}`}>
                   Explore <ArrowLongRightIcon className="ml-1 h-4 w-4" />
                 </NextLink>
               ),
