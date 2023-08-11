@@ -1,7 +1,7 @@
 'use client';
 import { Box, Button, Tooltip } from '@bigcommerce/big-design';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
-import classNames from 'classnames';
+import clsx from 'clsx';
 import GaugeComponent from 'react-gauge-component';
 import { type Product, type Review } from 'types';
 import { convertToDateString } from '~/utils/utils';
@@ -123,7 +123,7 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
             <div className="md:w-2/3">
               <h2
                 // @todo: replace calc based on `review.rating` with AI result
-                className={classNames('mb-3 text-3xl font-bold md:text-5xl', {
+                className={clsx('mb-3 text-3xl font-bold md:text-5xl', {
                   'text-red-500': review.rating < 2,
                   'text-yellow-300': review.rating >= 2 && review.rating < 4,
                   'text-green-500': review.rating >= 4,
