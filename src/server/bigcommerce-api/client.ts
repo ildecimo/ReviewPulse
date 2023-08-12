@@ -1,3 +1,4 @@
+import { type Review } from 'types';
 import { z } from 'zod';
 import { BIGCOMMERCE_API_URL } from '~/constants';
 
@@ -111,6 +112,22 @@ const fetchFromBigCommerceApi = (
       'content-type': 'application/json',
       'x-auth-token': accessToken,
     },
+  });
+
+const updateBigCommerceApi = (
+  path: string,
+  accessToken: string,
+  storeHash: string,
+  body: string
+) =>
+  fetch(`${BIGCOMMERCE_API_URL}/stores/${storeHash}/v3${path}`, {
+    method: 'PUT',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'x-auth-token': accessToken,
+    },
+    body,
   });
 
 export async function fetchProduct(
@@ -285,4 +302,33 @@ export async function fetchProducts(accessToken: string, storeHash: string) {
   );
 
   return cleanProducts;
+}
+
+export async function updateProductReview({
+  productId,
+  reviewId,
+  accessToken,
+  storeHash,
+  reviewData,
+}: {
+  productId: number;
+  reviewId: number;
+  accessToken: string;
+  storeHash: string;
+  reviewData: Partial<Review>;
+}) {
+  const response = await updateBigCommerceApi(
+    `/catalog/products/${productId}/reviews/${reviewId}`,
+    accessToken,
+    storeHash,
+    JSON.stringify(reviewData)
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to update review');
+  }
+
+  const review = (await response.json()) as Zod.infer<typeof reviewSchema>;
+
+  return review.data;
 }

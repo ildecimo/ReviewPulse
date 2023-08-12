@@ -2,6 +2,7 @@
 import { Box, Button, Tooltip } from '@bigcommerce/big-design';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
+import { useState } from 'react';
 import GaugeComponent from 'react-gauge-component';
 import { type Product, type Review } from 'types';
 import { convertToDateString } from '~/utils/utils';
@@ -15,7 +16,25 @@ interface ReviewDetailProps {
   review: Review;
 }
 
-export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
+export const ReviewDetail = ({
+  product,
+  review: reviewProp,
+}: ReviewDetailProps) => {
+  const [review, setReview] = useState(reviewProp);
+
+  const onApprove = () => {
+    fetch('/api/approve-review', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId: product.id,
+        reviewId: review.id,
+      }),
+    })
+      .then((res) => res.json() as Promise<Review>)
+      .then(setReview)
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div>
       <div>
@@ -150,6 +169,7 @@ export const ReviewDetail = ({ product, review }: ReviewDetailProps) => {
                   <Button
                     disabled={review.status === 'approved'}
                     iconLeft={<CheckIcon className="h-6 w-6" />}
+                    onClick={onApprove}
                   >
                     Approve
                   </Button>

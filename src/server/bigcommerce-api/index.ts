@@ -6,6 +6,7 @@ import {
   fetchProductReview,
   fetchProductReviews,
   fetchProducts,
+  updateProductReview,
 } from './client';
 
 export const fetchProductWithAttributes = async (
@@ -64,4 +65,26 @@ export const fetchAllProducts = async (
   const products = await fetchProducts(accessToken, storeHash);
 
   return products;
+};
+
+export const approveReview = async ({
+  productId,
+  reviewId,
+  accessToken,
+  storeHash,
+}: {
+  productId: number;
+  reviewId: number;
+  accessToken: string;
+  storeHash: string;
+}): Promise<Review> => {
+  const review = await updateProductReview({
+    productId,
+    reviewId,
+    accessToken,
+    storeHash,
+    reviewData: { status: 'approved' },
+  });
+
+  return review;
 };
