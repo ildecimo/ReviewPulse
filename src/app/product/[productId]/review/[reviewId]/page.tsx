@@ -2,8 +2,10 @@ import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
 
 import {
+  fetchCustomerOrders,
   fetchProductWithAttributes,
   fetchReview,
+  fetchReviews,
 } from '~/server/bigcommerce-api';
 
 import { ReviewDetail } from '~/components/ReviewDetail';
@@ -28,22 +30,26 @@ export default async function Page(props: PageProps) {
   const reviewId = Number(props.params.reviewId);
   const productId = Number(props.params.productId);
 
-  const product = await fetchProductWithAttributes(
-    productId,
-    accessToken,
-    authorized.storeHash
-  );
+  const [product, review, reviews] = await Promise.all([
+    fetchProductWithAttributes(productId, accessToken, authorized.storeHash),
+    fetchReview(productId, reviewId, accessToken, authorized.storeHash),
+    fetchReviews(productId, accessToken, authorized.storeHash),
+  ]);
 
-  const review = await fetchReview(
-    productId,
-    reviewId,
+  const customerOrders = await fetchCustomerOrders({
+    email: review.email,
     accessToken,
-    authorized.storeHash
-  );
+    storeHash: authorized.storeHash,
+  });
+
+  const customerReviews = reviews.filter((r) => r.email === review.email);
 
   return (
-    <div>
-      <ReviewDetail product={product} review={review} />
-    </div>
+    <ReviewDetail
+      customerOrders={customerOrders}
+      customerReviews={customerReviews}
+      product={product}
+      review={review}
+    />
   );
 }

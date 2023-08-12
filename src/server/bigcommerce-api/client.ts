@@ -1,111 +1,21 @@
 import { type Review } from 'types';
-import { z } from 'zod';
 import { BIGCOMMERCE_API_URL } from '~/constants';
-
-const productSchema = z.object({
-  data: z.object({
-    name: z.string(),
-    type: z.string(),
-    condition: z.string(),
-    weight: z.number(),
-    height: z.number(),
-    width: z.number(),
-    depth: z.number(),
-    videos: z.array(z.object({ description: z.string() })),
-    images: z.array(
-      z.object({
-        description: z.string(),
-        url_standard: z.string(),
-        is_thumbnail: z.boolean(),
-      })
-    ),
-    custom_fields: z.array(z.object({ name: z.string(), value: z.string() })),
-    brand_id: z.number().optional(),
-    categories: z.array(z.number()),
-  }),
-});
-
-const productsSchema = z.object({
-  data: z.array(
-    z.object({
-      id: z.number(),
-      name: z.string(),
-      type: z.string(),
-      condition: z.string(),
-      weight: z.number(),
-      height: z.number(),
-      width: z.number(),
-      depth: z.number(),
-      reviews_rating_sum: z.number(),
-      reviews_count: z.number(),
-      total_sold: z.number(),
-      is_visible: z.boolean(),
-      price: z.number(),
-      videos: z.array(z.object({ description: z.string() })),
-      images: z.array(
-        z.object({
-          description: z.string(),
-          url_standard: z.string(),
-          is_thumbnail: z.boolean(),
-        })
-      ),
-      custom_fields: z.array(z.object({ name: z.string(), value: z.string() })),
-      brand_id: z.number().optional(),
-      categories: z.array(z.number()),
-    })
-  ),
-});
-
-const categorySchema = z.object({
-  data: z.array(z.object({ name: z.string() })),
-});
-
-const brandSchema = z.object({
-  data: z.object({ name: z.string().optional() }),
-});
-
-const reviewObjectSchema = z.object({
-  title: z.string(),
-  text: z.string(),
-  status: z.enum(['approved', 'pending', 'disapproved']),
-  rating: z.number(),
-  email: z.string(),
-  name: z.string(),
-  date_reviewed: z.string(),
-  id: z.number(),
-  date_created: z.string(),
-  date_modified: z.string(),
-});
-
-const reviewSchema = z.object({
-  data: reviewObjectSchema,
-  meta: z.object({}),
-});
-
-const reviewsSchema = z.object({
-  data: z.array(reviewObjectSchema),
-  meta: z.object({
-    pagination: z.object({
-      total: z.number(),
-      count: z.number(),
-      per_page: z.number(),
-      current_page: z.number(),
-      total_pages: z.number(),
-      links: z.object({
-        previous: z.string().optional(),
-        current: z.string(),
-        next: z.string().optional(),
-      }),
-    }),
-  }),
-});
+import {
+  brandSchema,
+  categorySchema,
+  ordersSchema,
+  productSchema,
+  productsSchema,
+  reviewSchema,
+  reviewsSchema,
+} from '~/server/bigcommerce-api/schemas';
 
 const fetchFromBigCommerceApi = (
   path: string,
   accessToken: string,
   storeHash: string
 ) =>
-  fetch(`${BIGCOMMERCE_API_URL}/stores/${storeHash}/v3${path}`, {
+  fetch(`${BIGCOMMERCE_API_URL}/stores/${storeHash}${path}`, {
     method: 'GET',
     headers: {
       accept: 'application/json',
@@ -120,7 +30,7 @@ const updateBigCommerceApi = (
   storeHash: string,
   body: string
 ) =>
-  fetch(`${BIGCOMMERCE_API_URL}/stores/${storeHash}/v3${path}`, {
+  fetch(`${BIGCOMMERCE_API_URL}/stores/${storeHash}${path}`, {
     method: 'PUT',
     headers: {
       accept: 'application/json',
@@ -139,7 +49,7 @@ export async function fetchProduct(
     include: 'videos,images,custom_fields',
   }).toString();
   const response = await fetchFromBigCommerceApi(
-    `/catalog/products/${productId.toString()}?${params}`,
+    `/v3/catalog/products/${productId.toString()}?${params}`,
     accessToken,
     storeHash
   );
@@ -175,7 +85,7 @@ export async function fetchCategories(
     'id:in': categories.join(','),
   }).toString();
   const response = await fetchFromBigCommerceApi(
-    `/catalog/categories?${params}`,
+    `/v3/catalog/categories?${params}`,
     accessToken,
     storeHash
   );
@@ -199,7 +109,7 @@ export async function fetchBrand(
   storeHash: string
 ) {
   const response = await fetchFromBigCommerceApi(
-    `/catalog/brands/${brandId}`,
+    `/v3/catalog/brands/${brandId}`,
     accessToken,
     storeHash
   );
@@ -223,7 +133,7 @@ export async function fetchProductReviews(
   storeHash: string
 ) {
   const response = await fetchFromBigCommerceApi(
-    `/catalog/products/${productId}/reviews`,
+    `/v3/catalog/products/${productId}/reviews`,
     accessToken,
     storeHash
   );
@@ -248,7 +158,7 @@ export async function fetchProductReview(
   storeHash: string
 ) {
   const response = await fetchFromBigCommerceApi(
-    `/catalog/products/${productId}/reviews/${reviewId}`,
+    `/v3/catalog/products/${productId}/reviews/${reviewId}`,
     accessToken,
     storeHash
   );
@@ -272,7 +182,7 @@ export async function fetchProducts(accessToken: string, storeHash: string) {
   }).toString();
 
   const response = await fetchFromBigCommerceApi(
-    `/catalog/products?${params}`,
+    `/v3/catalog/products?${params}`,
     accessToken,
     storeHash
   );
@@ -318,7 +228,7 @@ export async function updateProductReview({
   reviewData: Partial<Review>;
 }) {
   const response = await updateBigCommerceApi(
-    `/catalog/products/${productId}/reviews/${reviewId}`,
+    `/v3/catalog/products/${productId}/reviews/${reviewId}`,
     accessToken,
     storeHash,
     JSON.stringify(reviewData)
@@ -331,4 +241,32 @@ export async function updateProductReview({
   const review = (await response.json()) as Zod.infer<typeof reviewSchema>;
 
   return review.data;
+}
+
+export async function fetchCustomerOrders({
+  email,
+  accessToken,
+  storeHash,
+}: {
+  email: string;
+  accessToken: string;
+  storeHash: string;
+}) {
+  const response = await fetchFromBigCommerceApi(
+    `/v2/orders?email=${email}`,
+    accessToken,
+    storeHash
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch orders');
+  }
+
+  const parsedOrders = ordersSchema.safeParse(await response.json());
+
+  if (!parsedOrders.success) {
+    throw new Error('Failed to parse orders');
+  }
+
+  return parsedOrders.data;
 }
