@@ -51,7 +51,8 @@ export const ReviewDetail = ({
   };
 
   const totalCustomerSpendings = customerOrders.reduce(
-    (acc, order) => acc + parseInt(order.total_inc_tax),
+    (acc, order) =>
+      acc + parseInt(order.total_inc_tax) + parseInt(order.store_credit_amount),
     0
   );
   const formattedTotalSpendings = convertToUDS(totalCustomerSpendings);
