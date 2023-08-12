@@ -165,12 +165,16 @@ export const ReviewDetail = ({
 
       <div className="my-6 grid grid-cols-4 gap-4">
         <Box
-          className="col-span-4 md:col-span-2 lg:col-span-3"
+          className="col-span-4 flex flex-col md:col-span-2 lg:col-span-3"
           border="box"
           padding="small"
           borderRadius="normal"
         >
-          <div className="flex h-full flex-col items-center justify-center">
+          <h2 className="text-2xl font-semibold text-gray-600">
+            Feedback and Suggestions
+          </h2>
+
+          <div className="flex flex-1 flex-col items-center justify-center pb-3 pt-4">
             <div className="space-y-3">
               <AIChatBubble message={sentimentAnalysis?.description} />
 
