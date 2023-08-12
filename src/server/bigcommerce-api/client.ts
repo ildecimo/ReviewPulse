@@ -265,6 +265,7 @@ export async function fetchCustomerOrders({
   const parsedOrders = ordersSchema.safeParse(await response.json());
 
   if (!parsedOrders.success) {
+    console.log(parsedOrders.error.issues[0]);
     throw new Error('Failed to parse orders');
   }
 
