@@ -1,7 +1,8 @@
 import { Source_Sans_3 } from 'next/font/google';
 import { type Metadata } from 'next/types';
-import StyledComponentsRegistry from '~/lib/registry';
+import { TailwindIndicator } from '~/components/TailwindIndicator';
 import ThemeProvider from '~/components/ThemeProvider';
+import StyledComponentsRegistry from '~/lib/registry';
 import '~/styles/main.css';
 
 const sourceSans = Source_Sans_3({
@@ -25,6 +26,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <ThemeProvider>
             <main className={sourceSans.className}>{children}</main>
+            <TailwindIndicator />
           </ThemeProvider>
         </StyledComponentsRegistry>
       </body>
