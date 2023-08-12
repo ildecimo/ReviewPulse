@@ -128,7 +128,7 @@ export const ReviewDetail = ({
                 </div>
               }
             >
-              Overall ustomer sentiment score
+              Overall customer sentiment score
             </Tooltip>
           }
         />
