@@ -9,7 +9,10 @@ import {
 } from '~/server/bigcommerce-api';
 
 import { ReviewDetail } from '~/components/ReviewDetail';
-import { analyzeReview } from '~/server/google-ai/analyze-review';
+import {
+  analyzeIssuesCategory,
+  analyzeReview,
+} from '~/server/google-ai/analyze-review';
 
 interface PageProps {
   params: { reviewId: string; productId: string };
@@ -45,7 +48,13 @@ export default async function Page(props: PageProps) {
 
   const customerReviews = reviews.filter((r) => r.email === review.email);
 
-  const analysis = await analyzeReview({
+  const sentimentAnalysis = await analyzeReview({
+    rating: review.rating,
+    text: review.text,
+    title: review.title,
+  });
+
+  const issuesCategories = await analyzeIssuesCategory({
     rating: review.rating,
     text: review.text,
     title: review.title,
@@ -53,7 +62,8 @@ export default async function Page(props: PageProps) {
 
   return (
     <ReviewDetail
-      sentimentAnalysis={analysis}
+      sentimentAnalysis={sentimentAnalysis}
+      issuesCategories={issuesCategories}
       customerOrders={customerOrders}
       customerReviews={customerReviews}
       product={product}

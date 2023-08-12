@@ -1,16 +1,22 @@
 'use client';
+
 import { Box, Button, Tooltip } from '@bigcommerce/big-design';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import GaugeComponent from 'react-gauge-component';
+
 import { type Product, type Review } from 'types';
 import { type Orders } from '~/server/bigcommerce-api/schemas';
-import { convertToDateString } from '~/utils/utils';
-import { Breadcrumbs } from './Breadcrumbs';
-import { Card } from './Card';
-import { ReviewStatusBadge } from './ReviewStatusBadge';
-import { StarRating } from './StarRating';
+
+import { AIChatBubble } from '~/components/AIChatBubble';
+import { Breadcrumbs } from '~/components/Breadcrumbs';
+import { Card } from '~/components/Card';
+import { IssuesBadges } from '~/components/IssueBadges';
+import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
+import { StarRating } from '~/components/StarRating';
+
+import { convertToDateString, convertToUDS } from '~/utils/utils';
 
 interface ReviewDetailProps {
   customerOrders: Orders;
@@ -18,6 +24,7 @@ interface ReviewDetailProps {
   product: Product;
   review: Review;
   sentimentAnalysis: string;
+  issuesCategories: string | undefined;
 }
 
 export const ReviewDetail = ({
@@ -26,6 +33,7 @@ export const ReviewDetail = ({
   product,
   review: reviewProp,
   sentimentAnalysis,
+  issuesCategories,
 }: ReviewDetailProps) => {
   const [review, setReview] = useState(reviewProp);
 
@@ -46,10 +54,12 @@ export const ReviewDetail = ({
     (acc, order) => acc + parseInt(order.total_inc_tax),
     0
   );
-  const formattedTotalSpendings = new Intl.NumberFormat('en-EN', {
-    style: 'currency',
-    currency: customerOrders[0]?.currency_code,
-  }).format(totalCustomerSpendings);
+  const formattedTotalSpendings = convertToUDS(totalCustomerSpendings);
+
+  const issuesCategoriesArray = useMemo(
+    () => issuesCategories?.split(',') ?? [],
+    [issuesCategories]
+  );
 
   return (
     <div>
@@ -136,30 +146,12 @@ export const ReviewDetail = ({
         />
       </div>
 
-      <Box>
-        <div className="items-center space-y-6 md:flex md:space-x-6">
-          <div className="md:w-1/3">
-            <div className="flex items-center justify-center rounded-lg bg-gray-50 pb-4 md:aspect-square md:pb-0">
-              <GaugeComponent
-                labels={{
-                  valueLabel: { hide: true },
-                  markLabel: {
-                    hideMinMax: true,
-                    valueConfig: { hide: true },
-                  },
-                }}
-                arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
-                pointer={{ type: 'needle', color: '#9ca3af' }}
-                type="semicircle"
-                value={review.rating * 20}
-              />
-            </div>
-          </div>
-
-          <div className="md:w-2/3">
-            <h2
-              // @todo: replace calc based on `review.rating` with AI result
-              className={clsx('mb-3 text-3xl font-bold md:text-5xl', {
+      <div className="my-6 grid gap-4 sm:grid-cols-2">
+        <Box border="box" padding="small" borderRadius="normal">
+          <h2 className="mb-3 text-2xl font-bold text-gray-600">
+            <span>Sentiment: </span>
+            <span
+              className={clsx({
                 'text-red-500': review.rating < 2,
                 'text-yellow-300': review.rating >= 2 && review.rating < 4,
                 'text-green-500': review.rating >= 4,
@@ -168,11 +160,39 @@ export const ReviewDetail = ({
               {review.rating < 2 && 'Negative'}
               {review.rating >= 2 && review.rating < 4 && 'Neutral'}
               {review.rating >= 4 && 'Positive'}
-            </h2>
-
-            <p className="text-xl text-gray-800">
-              AI: &quot;{sentimentAnalysis}&quot;
-            </p>
+            </span>
+          </h2>
+          <div className="flex items-center justify-center rounded-lg bg-gray-50 pb-4">
+            <GaugeComponent
+              labels={{
+                valueLabel: { hide: true },
+                markLabel: {
+                  hideMinMax: true,
+                  valueConfig: { hide: true },
+                },
+              }}
+              arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
+              pointer={{ type: 'needle', color: '#9ca3af' }}
+              type="semicircle"
+              value={review.rating * 20}
+            />
+          </div>
+        </Box>
+        <Box border="box" padding="small" borderRadius="normal">
+          <div className="flex h-full flex-col items-center justify-center">
+            <div>
+              <AIChatBubble message={sentimentAnalysis} />
+              <div className="w-[calc(100%-62px)]">
+                <AIChatBubble
+                  message={
+                    <IssuesBadges
+                      issuesCategoriesArray={issuesCategoriesArray}
+                    />
+                  }
+                  hideAvatar
+                />
+              </div>
+            </div>
 
             <div className="mt-8">
               <h3 className="mb-3 mt-0 text-lg font-medium text-gray-600">
@@ -204,8 +224,8 @@ export const ReviewDetail = ({
               </div>
             </div>
           </div>
-        </div>
-      </Box>
+        </Box>
+      </div>
     </div>
   );
 };
