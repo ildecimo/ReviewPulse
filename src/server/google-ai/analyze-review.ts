@@ -60,8 +60,10 @@ Output Format:
    "description": string,
    "issueCategories": Array<"shipping" | "product quality" | "product packaging" | "customer service" | "payment process" | "price" | "return and refund" | "sales and promotions" | "website experience" | "customer expectations">,
    "keywords": Array<string>,
-   "score": number,
+   "score": number
 }
+
+(Remember, the output must be in valid JSON format)
 
 Output Format details:
 
