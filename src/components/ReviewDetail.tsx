@@ -17,6 +17,7 @@ interface ReviewDetailProps {
   customerReviews: Review[];
   product: Product;
   review: Review;
+  sentimentAnalysis: string;
 }
 
 export const ReviewDetail = ({
@@ -24,6 +25,7 @@ export const ReviewDetail = ({
   customerReviews,
   product,
   review: reviewProp,
+  sentimentAnalysis,
 }: ReviewDetailProps) => {
   const [review, setReview] = useState(reviewProp);
 
@@ -169,10 +171,7 @@ export const ReviewDetail = ({
             </h2>
 
             <p className="text-xl text-gray-800">
-              AI: &quot;Suspendisse auctor eget sapien sit amet sagittis.
-              Pellentesque sagittis tortor magna, eu efficitur purus maximus
-              vel. Sed non odio dignissim, dignissim lectus ac, imperdiet
-              quam&quot;
+              AI: &quot;{sentimentAnalysis}&quot;
             </p>
 
             <div className="mt-8">

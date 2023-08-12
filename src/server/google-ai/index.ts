@@ -1,10 +1,10 @@
+import { TextServiceClient } from '@google-ai/generativelanguage';
+import { GoogleAuth } from 'google-auth-library';
 import { type z } from 'zod';
 import { env } from '~/env.mjs';
-import { GoogleAuth } from 'google-auth-library';
-import { TextServiceClient } from '@google-ai/generativelanguage';
 
-import { DEFAULT_GUIDED_ATTRIBUTES, STYLE_OPTIONS } from '~/constants';
 import { type aiSchema } from '~/app/api/generateDescription/schema';
+import { DEFAULT_GUIDED_ATTRIBUTES, STYLE_OPTIONS } from '~/constants';
 
 const MODEL_NAME = 'models/text-bison-001';
 const API_KEY = env.GOOGLE_API_KEY;
