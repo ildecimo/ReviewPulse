@@ -92,6 +92,10 @@ The review to analyze:
     if (response?.[0]?.candidates) {
       const output = response[0].candidates[0]?.output;
 
+      if (env.NODE_ENV === 'development') {
+        console.log('*** [Vertex Output] ::', output);
+      }
+
       if (output) {
         const parsedOutput = analyzeReviewOutputSchema.safeParse(
           JSON.parse(output)
