@@ -2,11 +2,17 @@ import { authorize } from '~/lib/authorize';
 import * as db from '~/lib/db';
 
 import {
+  fetchCustomerOrders,
   fetchProductWithAttributes,
   fetchReview,
+  fetchReviews,
 } from '~/server/bigcommerce-api';
 
 import { ReviewDetail } from '~/components/ReviewDetail';
+import {
+  analyzeIssuesCategory,
+  analyzeReview,
+} from '~/server/google-ai/analyze-review';
 
 interface PageProps {
   params: { reviewId: string; productId: string };
@@ -28,22 +34,40 @@ export default async function Page(props: PageProps) {
   const reviewId = Number(props.params.reviewId);
   const productId = Number(props.params.productId);
 
-  const product = await fetchProductWithAttributes(
-    productId,
-    accessToken,
-    authorized.storeHash
-  );
+  const [product, review, reviews] = await Promise.all([
+    fetchProductWithAttributes(productId, accessToken, authorized.storeHash),
+    fetchReview(productId, reviewId, accessToken, authorized.storeHash),
+    fetchReviews(productId, accessToken, authorized.storeHash),
+  ]);
 
-  const review = await fetchReview(
-    productId,
-    reviewId,
+  const customerOrders = await fetchCustomerOrders({
+    email: review.email,
     accessToken,
-    authorized.storeHash
-  );
+    storeHash: authorized.storeHash,
+  });
+
+  const customerReviews = reviews.filter((r) => r.email === review.email);
+
+  const sentimentAnalysis = await analyzeReview({
+    rating: review.rating,
+    text: review.text,
+    title: review.title,
+  });
+
+  const issuesCategories = await analyzeIssuesCategory({
+    rating: review.rating,
+    text: review.text,
+    title: review.title,
+  });
 
   return (
-    <div>
-      <ReviewDetail product={product} review={review} />
-    </div>
+    <ReviewDetail
+      sentimentAnalysis={sentimentAnalysis}
+      issuesCategories={issuesCategories}
+      customerOrders={customerOrders}
+      customerReviews={customerReviews}
+      product={product}
+      review={review}
+    />
   );
 }

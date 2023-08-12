@@ -1,11 +1,13 @@
 import { type Product, type Review, type SimpleProduct } from 'types';
 import {
+  fetchCustomerOrders as _fetchCustomerOrders,
   fetchBrand,
   fetchCategories,
   fetchProduct,
   fetchProductReview,
   fetchProductReviews,
   fetchProducts,
+  updateProductReview,
 } from './client';
 
 export const fetchProductWithAttributes = async (
@@ -64,4 +66,45 @@ export const fetchAllProducts = async (
   const products = await fetchProducts(accessToken, storeHash);
 
   return products;
+};
+
+export const approveReview = async ({
+  productId,
+  reviewId,
+  accessToken,
+  storeHash,
+}: {
+  productId: number;
+  reviewId: number;
+  accessToken: string;
+  storeHash: string;
+}): Promise<Review> => {
+  const review = await updateProductReview({
+    productId,
+    reviewId,
+    accessToken,
+    storeHash,
+    reviewData: { status: 'approved' },
+  });
+
+  return review;
+};
+
+// @todo this wrapper isn't really necessary, we should simplify the api. But not today.
+export const fetchCustomerOrders = async ({
+  email,
+  accessToken,
+  storeHash,
+}: {
+  email: string;
+  accessToken: string;
+  storeHash: string;
+}) => {
+  const orders = await _fetchCustomerOrders({
+    email,
+    accessToken,
+    storeHash,
+  });
+
+  return orders;
 };
