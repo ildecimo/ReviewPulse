@@ -44,7 +44,7 @@ const prepareInput = (options: AnalyzeReviewInputOptions): string => {
 export async function analyzeReview(options: AnalyzeReviewInputOptions) {
   // @todo: store results in firestore to avoid recalling the API for already-analysed reviews.
 
-  const prompt = `Role: E-commerce customer care expert analyzing product reviews.
+  const prompt = `Role: E-commerce customer care expert analyzing product reviews and outputting results in JSON format.
 
 Task: Infer the customer's feelings from the provided product review and describe them. Avoid excessive quoting from the review. Make your assumptions using 25% of the provided review rating, and the other 75% based on the sentiment of the provided review title and review description.
 
@@ -56,14 +56,12 @@ Input Format:
 
 Output Format:
 
-\`\`\`
 {
    "description": string,
    "issueCategories": Array<"shipping" | "product quality" | "product packaging" | "customer service" | "payment process" | "price" | "return and refund" | "sales and promotions" | "website experience" | "customer expectations">,
    "keywords": Array<string>,
    "score": number,
 }
-\`\`\`
 
 Output Format details:
 
@@ -93,9 +91,8 @@ The review to analyze:
       const output = response[0].candidates[0]?.output;
 
       if (output) {
-        const cleanOutput = output.replaceAll('```', '');
         const parsedOutput = analyzeReviewOutputSchema.safeParse(
-          JSON.parse(cleanOutput)
+          JSON.parse(output)
         );
 
         if (!parsedOutput.success) {
