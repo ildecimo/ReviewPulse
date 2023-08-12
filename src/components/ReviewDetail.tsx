@@ -16,6 +16,7 @@ import { IssuesBadges } from '~/components/IssueBadges';
 import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
 import { StarRating } from '~/components/StarRating';
 
+import { CloseIcon } from '@bigcommerce/big-design-icons';
 import { type AnalyzeReviewOutputValues } from '~/server/google-ai/analyze-review';
 import { convertToDateString, convertToUDS } from '~/utils/utils';
 
@@ -72,6 +73,10 @@ export const ReviewDetail = ({
 
   const sentimentScore = sentimentAnalysis?.score ?? 0;
   const sentimentString = getSentimentString(sentimentScore);
+
+  const isPositive = sentimentString === Sentiment.POSITIVE;
+  const isNeutral = sentimentString === Sentiment.NEUTRAL;
+  const isNegative = sentimentString === Sentiment.NEGATIVE;
 
   return (
     <div>
@@ -164,9 +169,9 @@ export const ReviewDetail = ({
             <span>Sentiment: </span>
             <span
               className={clsx('capitalize', {
-                'text-red-500': sentimentString === Sentiment.NEGATIVE,
-                'text-yellow-300': sentimentString === Sentiment.NEUTRAL,
-                'text-green-500': sentimentString === Sentiment.POSITIVE,
+                'text-red-500': isNegative,
+                'text-yellow-300': isNeutral,
+                'text-green-500': isPositive,
               })}
             >
               {sentimentString.toLowerCase()}
@@ -190,8 +195,9 @@ export const ReviewDetail = ({
         </Box>
         <Box border="box" padding="small" borderRadius="normal">
           <div className="flex h-full flex-col items-center justify-center">
-            <div>
+            <div className="space-y-3">
               <AIChatBubble message={sentimentAnalysis?.description} />
+
               <div className="w-[calc(100%-62px)]">
                 <AIChatBubble
                   message={
@@ -204,35 +210,40 @@ export const ReviewDetail = ({
                   hideAvatar
                 />
               </div>
-            </div>
 
-            <div className="mt-8">
-              <h3 className="mb-3 mt-0 text-lg font-medium text-gray-600">
-                Suggested Actions
-              </h3>
+              <div className="flex space-x-3 pl-16">
+                {review.status !== 'approved' && (isNeutral || isPositive) && (
+                  <Button
+                    iconLeft={<CheckIcon className="h-6 w-6" />}
+                    onClick={onApprove}
+                  >
+                    Approve
+                  </Button>
+                )}
 
-              <div>
-                <Button
-                  disabled={review.status === 'approved'}
-                  iconLeft={<CheckIcon className="h-6 w-6" />}
-                  onClick={onApprove}
-                >
-                  Approve
-                </Button>
+                {review.status !== 'disapproved' && isNegative && (
+                  <Button disabled iconLeft={<CloseIcon className="h-6 w-6" />}>
+                    Disapprove (TODO)
+                  </Button>
+                )}
 
-                <Button
-                  iconLeft={<HeartIcon className="h-6 w-6" />}
-                  variant="secondary"
-                >
-                  Thank you email
-                </Button>
+                {isPositive && (
+                  <Button
+                    iconLeft={<HeartIcon className="h-6 w-6" />}
+                    variant="secondary"
+                  >
+                    Thank you email
+                  </Button>
+                )}
 
-                <Button
-                  iconLeft={<EnvelopeIcon className="h-6 w-6" />}
-                  variant="secondary"
-                >
-                  Follow-up email
-                </Button>
+                {(isNeutral || isNegative) && (
+                  <Button
+                    iconLeft={<EnvelopeIcon className="h-6 w-6" />}
+                    variant="secondary"
+                  >
+                    Follow-up email
+                  </Button>
+                )}
               </div>
             </div>
           </div>
