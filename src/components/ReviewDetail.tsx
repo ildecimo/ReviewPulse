@@ -16,6 +16,7 @@ import { IssuesBadges } from '~/components/IssueBadges';
 import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
 import { StarRating } from '~/components/StarRating';
 
+import { type AnalyzeReviewOutputValues } from '~/server/google-ai/analyze-review';
 import { convertToDateString, convertToUDS } from '~/utils/utils';
 
 interface ReviewDetailProps {
@@ -23,9 +24,22 @@ interface ReviewDetailProps {
   customerReviews: Review[];
   product: Product;
   review: Review;
-  sentimentAnalysis: string;
-  issuesCategories: string | undefined;
+  sentimentAnalysis?: AnalyzeReviewOutputValues;
 }
+
+enum Sentiment {
+  NEGATIVE = 'NEGATIVE',
+  NEUTRAL = 'NEUTRAL',
+  POSITIVE = 'POSITIVE',
+}
+
+const getSentimentString = (score: number) => {
+  if (score < 33) return Sentiment.NEGATIVE;
+
+  if (score >= 33 && score < 66) return Sentiment.NEUTRAL;
+
+  return Sentiment.POSITIVE;
+};
 
 export const ReviewDetail = ({
   customerOrders,
@@ -33,7 +47,6 @@ export const ReviewDetail = ({
   product,
   review: reviewProp,
   sentimentAnalysis,
-  issuesCategories,
 }: ReviewDetailProps) => {
   const [review, setReview] = useState(reviewProp);
 
@@ -57,10 +70,8 @@ export const ReviewDetail = ({
   );
   const formattedTotalSpendings = convertToUDS(totalCustomerSpendings);
 
-  const issuesCategoriesArray = useMemo(
-    () => issuesCategories?.split(',') ?? [],
-    [issuesCategories]
-  );
+  const sentimentScore = sentimentAnalysis?.score ?? 0;
+  const sentimentString = getSentimentString(sentimentScore);
 
   return (
     <div>
@@ -152,15 +163,13 @@ export const ReviewDetail = ({
           <h2 className="mb-3 text-2xl font-bold text-gray-600">
             <span>Sentiment: </span>
             <span
-              className={clsx({
-                'text-red-500': review.rating < 2,
-                'text-yellow-300': review.rating >= 2 && review.rating < 4,
-                'text-green-500': review.rating >= 4,
+              className={clsx('capitalize', {
+                'text-red-500': sentimentString === Sentiment.NEGATIVE,
+                'text-yellow-300': sentimentString === Sentiment.NEUTRAL,
+                'text-green-500': sentimentString === Sentiment.POSITIVE,
               })}
             >
-              {review.rating < 2 && 'Negative'}
-              {review.rating >= 2 && review.rating < 4 && 'Neutral'}
-              {review.rating >= 4 && 'Positive'}
+              {sentimentString.toLowerCase()}
             </span>
           </h2>
           <div className="flex items-center justify-center rounded-lg bg-gray-50 pb-4">
@@ -175,19 +184,21 @@ export const ReviewDetail = ({
               arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
               pointer={{ type: 'needle', color: '#9ca3af' }}
               type="semicircle"
-              value={review.rating * 20}
+              value={sentimentScore}
             />
           </div>
         </Box>
         <Box border="box" padding="small" borderRadius="normal">
           <div className="flex h-full flex-col items-center justify-center">
             <div>
-              <AIChatBubble message={sentimentAnalysis} />
+              <AIChatBubble message={sentimentAnalysis?.description} />
               <div className="w-[calc(100%-62px)]">
                 <AIChatBubble
                   message={
                     <IssuesBadges
-                      issuesCategoriesArray={issuesCategoriesArray}
+                      issuesCategoriesArray={
+                        sentimentAnalysis?.issueCategories ?? []
+                      }
                     />
                   }
                   hideAvatar

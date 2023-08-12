@@ -9,10 +9,7 @@ import {
 } from '~/server/bigcommerce-api';
 
 import { ReviewDetail } from '~/components/ReviewDetail';
-import {
-  analyzeIssuesCategory,
-  analyzeReview,
-} from '~/server/google-ai/analyze-review';
+import { analyzeReview } from '~/server/google-ai/analyze-review';
 
 interface PageProps {
   params: { reviewId: string; productId: string };
@@ -54,16 +51,12 @@ export default async function Page(props: PageProps) {
     title: review.title,
   });
 
-  const issuesCategories = await analyzeIssuesCategory({
-    rating: review.rating,
-    text: review.text,
-    title: review.title,
-  });
-
   return (
     <ReviewDetail
-      sentimentAnalysis={sentimentAnalysis}
-      issuesCategories={issuesCategories}
+      sentimentAnalysis={
+        // @todo: improve this shitty thing
+        typeof sentimentAnalysis === 'string' ? undefined : sentimentAnalysis
+      }
       customerOrders={customerOrders}
       customerReviews={customerReviews}
       product={product}
