@@ -3,7 +3,7 @@
 import { Box, Button, Tooltip } from '@bigcommerce/big-design';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import GaugeComponent from 'react-gauge-component';
 
 import { type Product, type Review } from 'types';
@@ -163,37 +163,13 @@ export const ReviewDetail = ({
         />
       </div>
 
-      <div className="my-6 grid gap-4 sm:grid-cols-2">
-        <Box border="box" padding="small" borderRadius="normal">
-          <h2 className="mb-3 text-2xl font-bold text-gray-600">
-            <span>Sentiment: </span>
-            <span
-              className={clsx('capitalize', {
-                'text-red-500': isNegative,
-                'text-yellow-300': isNeutral,
-                'text-green-500': isPositive,
-              })}
-            >
-              {sentimentString.toLowerCase()}
-            </span>
-          </h2>
-          <div className="flex items-center justify-center rounded-lg bg-gray-50 pb-4">
-            <GaugeComponent
-              labels={{
-                valueLabel: { hide: true },
-                markLabel: {
-                  hideMinMax: true,
-                  valueConfig: { hide: true },
-                },
-              }}
-              arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
-              pointer={{ type: 'needle', color: '#9ca3af' }}
-              type="semicircle"
-              value={sentimentScore}
-            />
-          </div>
-        </Box>
-        <Box border="box" padding="small" borderRadius="normal">
+      <div className="my-6 grid grid-cols-4 gap-4">
+        <Box
+          className="col-span-4 md:col-span-2 lg:col-span-3"
+          border="box"
+          padding="small"
+          borderRadius="normal"
+        >
           <div className="flex h-full flex-col items-center justify-center">
             <div className="space-y-3">
               <AIChatBubble message={sentimentAnalysis?.description} />
@@ -211,7 +187,7 @@ export const ReviewDetail = ({
                 />
               </div>
 
-              <div className="flex space-x-3 pl-16">
+              <div className="pl-16">
                 {review.status !== 'approved' && (isNeutral || isPositive) && (
                   <Button
                     iconLeft={<CheckIcon className="h-6 w-6" />}
@@ -245,6 +221,62 @@ export const ReviewDetail = ({
                   </Button>
                 )}
               </div>
+            </div>
+          </div>
+        </Box>
+
+        <Box
+          className="col-span-4 md:col-span-2 lg:col-span-1"
+          border="box"
+          padding="small"
+          borderRadius="normal"
+        >
+          <div className="mb-4">
+            <h2 className="mb-3 text-2xl font-semibold text-gray-600">
+              <span>Sentiment</span>{' '}
+              <span
+                className={clsx('rounded-md px-2 font-semibold capitalize', {
+                  'bg-red-500 text-white': isNegative,
+                  'bg-yellow-300 text-yellow-800': isNeutral,
+                  'bg-green-500 text-white': isPositive,
+                })}
+              >
+                {sentimentString.toLowerCase()}
+              </span>
+            </h2>
+
+            <div className="max-w-xs rounded-lg border border-gray-100 bg-gray-50 pb-4 md:max-w-none">
+              <GaugeComponent
+                labels={{
+                  valueLabel: { hide: true },
+                  markLabel: {
+                    hideMinMax: true,
+                    valueConfig: { hide: true },
+                  },
+                }}
+                arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
+                pointer={{ type: 'needle', color: '#9ca3af' }}
+                type="semicircle"
+                value={sentimentScore}
+                style={{ maxWidth: '100%' }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-2xl font-semibold text-gray-600">
+              Keywords
+            </h3>
+
+            <div className="flex flex-wrap items-baseline gap-2 text-lg">
+              {sentimentAnalysis?.keywords?.map((keyword) => (
+                <div
+                  key={keyword}
+                  className="rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 capitalize"
+                >
+                  {keyword}
+                </div>
+              ))}
             </div>
           </div>
         </Box>
