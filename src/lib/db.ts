@@ -8,6 +8,10 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 import { env } from '~/env.mjs';
+import {
+  AnalyzeReviewOutputValues,
+  analyzeReviewOutputSchema,
+} from '~/server/google-ai/analyze-review';
 
 export interface UserData {
   email: string;
@@ -105,4 +109,64 @@ export async function getStoreToken(storeHash: string): Promise<string | null> {
 export async function deleteStore(storeHash: string) {
   const ref = doc(db, 'store', storeHash);
   await deleteDoc(ref);
+}
+
+export async function getReviewAnalysis({
+  productId,
+  reviewId,
+  storeHash,
+}: {
+  productId: number;
+  reviewId: number;
+  storeHash: string;
+}): Promise<AnalyzeReviewOutputValues | null> {
+  if (!storeHash) return null;
+
+  const ref = doc(
+    db,
+    'reviewAnalysis',
+    storeHash,
+    'products',
+    `${productId}`,
+    'reviews',
+    `${reviewId}`
+  );
+
+  const analysisDoc = await getDoc(ref);
+
+  const parsedAnalysis = analyzeReviewOutputSchema.safeParse(
+    analysisDoc.data()
+  );
+
+  if (!parsedAnalysis.success) {
+    return null;
+  }
+
+  return parsedAnalysis.data;
+}
+
+export async function setReviewAnalysis({
+  analysis,
+  productId,
+  reviewId,
+  storeHash,
+}: {
+  analysis: AnalyzeReviewOutputValues;
+  productId: number;
+  reviewId: number;
+  storeHash: string;
+}) {
+  if (!storeHash) return null;
+
+  const ref = doc(
+    db,
+    'reviewAnalysis',
+    storeHash,
+    'products',
+    `${productId}`,
+    'reviews',
+    `${reviewId}`
+  );
+
+  await setDoc(ref, analysis);
 }

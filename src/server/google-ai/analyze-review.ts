@@ -14,7 +14,7 @@ const analyzeReviewInputSchema = z.object({
 
 type AnalyzeReviewInputOptions = z.infer<typeof analyzeReviewInputSchema>;
 
-const analyzeReviewOutputSchema = z.object({
+export const analyzeReviewOutputSchema = z.object({
   description: z.string(),
   issueCategories: z.array(z.string()),
   keywords: z.array(z.string()),

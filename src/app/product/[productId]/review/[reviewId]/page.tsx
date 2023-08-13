@@ -45,17 +45,37 @@ export default async function Page(props: PageProps) {
 
   const customerReviews = reviews.filter((r) => r.email === review.email);
 
-  const sentimentAnalysis = await analyzeReview({
-    rating: review.rating,
-    text: review.text,
-    title: review.title,
+  let sentimentAnalysis = await db.getReviewAnalysis({
+    productId,
+    reviewId,
+    storeHash: authorized.storeHash,
   });
+
+  if (!sentimentAnalysis) {
+    const freshAnalysis = await analyzeReview({
+      rating: review.rating,
+      text: review.text,
+      title: review.title,
+    });
+
+    if (freshAnalysis && typeof freshAnalysis !== 'string') {
+      sentimentAnalysis = freshAnalysis;
+
+      await db.setReviewAnalysis({
+        analysis: freshAnalysis,
+        productId,
+        reviewId,
+        storeHash: authorized.storeHash,
+      });
+    }
+  }
 
   return (
     <ReviewDetail
       sentimentAnalysis={
-        // @todo: improve this shitty thing
-        typeof sentimentAnalysis === 'string' ? undefined : sentimentAnalysis
+        !sentimentAnalysis || typeof sentimentAnalysis === 'string'
+          ? undefined
+          : sentimentAnalysis
       }
       customerOrders={customerOrders}
       customerReviews={customerReviews}
