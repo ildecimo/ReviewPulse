@@ -4,12 +4,12 @@ interface IssuesBadgesProps {
   issuesCategoriesArray?: string[];
 }
 
-export const IssuesBadges = ({
+export const IssueBadges = ({
   issuesCategoriesArray = [],
 }: IssuesBadgesProps) => {
   return (
     <div className="flex flex-wrap items-center">
-      <span className="mr-2">Issues found:</span>
+      <span className="mr-2">Issues:</span>
 
       {issuesCategoriesArray.length > 0 ? (
         issuesCategoriesArray.map((issue) => (
