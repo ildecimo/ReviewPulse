@@ -90,6 +90,28 @@ export const approveReview = async ({
   return review;
 };
 
+export const disapproveReview = async ({
+  productId,
+  reviewId,
+  accessToken,
+  storeHash,
+}: {
+  productId: number;
+  reviewId: number;
+  accessToken: string;
+  storeHash: string;
+}): Promise<Review> => {
+  const review = await updateProductReview({
+    productId,
+    reviewId,
+    accessToken,
+    storeHash,
+    reviewData: { status: 'disapproved' },
+  });
+
+  return review;
+};
+
 // @todo this wrapper isn't really necessary, we should simplify the api. But not today.
 export const fetchCustomerOrders = async ({
   email,

@@ -1,4 +1,5 @@
 'use client';
+
 import { type Product, type Review } from 'types';
 
 import { Table } from '@bigcommerce/big-design';
@@ -11,16 +12,20 @@ import { NextLink } from '~/components/NextLink';
 import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
 import { StarRating } from '~/components/StarRating';
 
+import { ScoreCircle } from '~/components/ScoreCircle';
+import { type ReviewAnalysesByProductIdResponse } from '~/lib/db';
 import { convertToDateString } from '~/utils/utils';
 
 interface ProductReviewListProps {
   product: Product;
   reviews: Review[];
+  reviewAnalyses: ReviewAnalysesByProductIdResponse;
 }
 
 export const ProductReviewList = ({
   product,
   reviews,
+  reviewAnalyses,
 }: ProductReviewListProps) => {
   const averageRating = useMemo(() => {
     return (
@@ -38,6 +43,15 @@ export const ProductReviewList = ({
       approvedReviews.length
     );
   }, [approvedReviews]);
+
+  const averageSentiment = useMemo(
+    () =>
+      Math.floor(
+        reviewAnalyses.reduce((acc, analysis) => acc + analysis.data.score, 0) /
+          reviewAnalyses.length
+      ),
+    [reviewAnalyses]
+  );
 
   return (
     <div>
@@ -94,11 +108,38 @@ export const ProductReviewList = ({
                 </div>
               </>
             }
+            topRightContent={
+              <ScoreCircle
+                score={averageSentiment}
+                tooltip="Average product sentiment"
+              />
+            }
           />
         </div>
 
         <Table
           columns={[
+            {
+              header: 'Score',
+              hash: 'score',
+              render: (review) => {
+                const score = reviewAnalyses?.find(
+                  (r) => r.id === `${review.id}`
+                )?.data?.score;
+
+                return (
+                  <ScoreCircle
+                    score={score}
+                    tooltip={
+                      typeof score === 'number'
+                        ? 'Sentiment score'
+                        : 'Unanalyzed review'
+                    }
+                    tooltipPlacement="right"
+                  />
+                );
+              },
+            },
             {
               header: 'Rating',
               hash: 'rating',

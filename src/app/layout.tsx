@@ -1,7 +1,8 @@
 import { Source_Sans_3 } from 'next/font/google';
 import { type Metadata } from 'next/types';
-import StyledComponentsRegistry from '~/lib/registry';
+import { TailwindIndicator } from '~/components/TailwindIndicator';
 import ThemeProvider from '~/components/ThemeProvider';
+import StyledComponentsRegistry from '~/lib/registry';
 import '~/styles/main.css';
 
 const sourceSans = Source_Sans_3({
@@ -9,7 +10,7 @@ const sourceSans = Source_Sans_3({
   weight: ['300', '400', '600', '700', '800'],
 });
 
-export const metadata: Metadata = { title: 'Product description generator' };
+export const metadata: Metadata = { title: 'Review Pulse - ildecimo BigAI' };
 
 export default function RootLayout({
   children,
@@ -25,6 +26,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <ThemeProvider>
             <main className={sourceSans.className}>{children}</main>
+            <TailwindIndicator />
           </ThemeProvider>
         </StyledComponentsRegistry>
       </body>

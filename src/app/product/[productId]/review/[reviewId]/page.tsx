@@ -9,10 +9,7 @@ import {
 } from '~/server/bigcommerce-api';
 
 import { ReviewDetail } from '~/components/ReviewDetail';
-import {
-  analyzeIssuesCategory,
-  analyzeReview,
-} from '~/server/google-ai/analyze-review';
+import { analyzeReview } from '~/server/google-ai/analyze-review';
 
 interface PageProps {
   params: { reviewId: string; productId: string };
@@ -48,22 +45,38 @@ export default async function Page(props: PageProps) {
 
   const customerReviews = reviews.filter((r) => r.email === review.email);
 
-  const sentimentAnalysis = await analyzeReview({
-    rating: review.rating,
-    text: review.text,
-    title: review.title,
+  let sentimentAnalysis = await db.getReviewAnalysis({
+    productId,
+    reviewId,
+    storeHash: authorized.storeHash,
   });
 
-  const issuesCategories = await analyzeIssuesCategory({
-    rating: review.rating,
-    text: review.text,
-    title: review.title,
-  });
+  if (!sentimentAnalysis) {
+    const freshAnalysis = await analyzeReview({
+      rating: review.rating,
+      text: review.text,
+      title: review.title,
+    });
+
+    if (freshAnalysis && typeof freshAnalysis !== 'string') {
+      sentimentAnalysis = freshAnalysis;
+
+      await db.setReviewAnalysis({
+        analysis: freshAnalysis,
+        productId,
+        reviewId,
+        storeHash: authorized.storeHash,
+      });
+    }
+  }
 
   return (
     <ReviewDetail
-      sentimentAnalysis={sentimentAnalysis}
-      issuesCategories={issuesCategories}
+      sentimentAnalysis={
+        !sentimentAnalysis || typeof sentimentAnalysis === 'string'
+          ? undefined
+          : sentimentAnalysis
+      }
       customerOrders={customerOrders}
       customerReviews={customerReviews}
       product={product}

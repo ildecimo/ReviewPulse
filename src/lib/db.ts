@@ -1,13 +1,20 @@
 import { initializeApp } from 'firebase/app';
 import {
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
+import { z } from 'zod';
 import { env } from '~/env.mjs';
+import {
+  AnalyzeReviewOutputValues,
+  analyzeReviewOutputSchema,
+} from '~/server/google-ai/analyze-review';
 
 export interface UserData {
   email: string;
@@ -105,4 +112,103 @@ export async function getStoreToken(storeHash: string): Promise<string | null> {
 export async function deleteStore(storeHash: string) {
   const ref = doc(db, 'store', storeHash);
   await deleteDoc(ref);
+}
+
+export async function getReviewAnalysis({
+  productId,
+  reviewId,
+  storeHash,
+}: {
+  productId: number;
+  reviewId: number;
+  storeHash: string;
+}): Promise<AnalyzeReviewOutputValues | null> {
+  if (!storeHash) return null;
+
+  const ref = doc(
+    db,
+    'reviewAnalysis',
+    storeHash,
+    'products',
+    `${productId}`,
+    'reviews',
+    `${reviewId}`
+  );
+
+  const analysisDoc = await getDoc(ref);
+
+  const parsedAnalysis = analyzeReviewOutputSchema.safeParse(
+    analysisDoc.data()
+  );
+
+  if (!parsedAnalysis.success) {
+    return null;
+  }
+
+  return parsedAnalysis.data;
+}
+
+export async function setReviewAnalysis({
+  analysis,
+  productId,
+  reviewId,
+  storeHash,
+}: {
+  analysis: AnalyzeReviewOutputValues;
+  productId: number;
+  reviewId: number;
+  storeHash: string;
+}) {
+  if (!storeHash) return null;
+
+  const ref = doc(
+    db,
+    'reviewAnalysis',
+    storeHash,
+    'products',
+    `${productId}`,
+    'reviews',
+    `${reviewId}`
+  );
+
+  await setDoc(ref, analysis);
+}
+
+const reviewAnalysesListSchema = z.array(
+  z.object({ id: z.string(), data: analyzeReviewOutputSchema })
+);
+
+export type ReviewAnalysesByProductIdResponse = Zod.infer<
+  typeof reviewAnalysesListSchema
+>;
+
+export async function getReviewAnalysesByProductId({
+  productId,
+  storeHash,
+}: {
+  productId: number;
+  storeHash: string;
+}): Promise<ReviewAnalysesByProductIdResponse | null> {
+  if (!storeHash) return null;
+
+  const ref = collection(
+    db,
+    'reviewAnalysis',
+    storeHash,
+    'products',
+    `${productId}`,
+    'reviews'
+  );
+
+  const snapshot = await getDocs(ref);
+
+  const parsedAnalyses = reviewAnalysesListSchema.safeParse(
+    snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }))
+  );
+
+  if (!parsedAnalyses.success) {
+    return null;
+  }
+
+  return parsedAnalyses.data;
 }

@@ -1,9 +1,9 @@
 'use client';
 
-import { Box, Button, Tooltip } from '@bigcommerce/big-design';
+import { Box, Button } from '@bigcommerce/big-design';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import GaugeComponent from 'react-gauge-component';
 
 import { type Product, type Review } from 'types';
@@ -16,15 +16,17 @@ import { IssuesBadges } from '~/components/IssueBadges';
 import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
 import { StarRating } from '~/components/StarRating';
 
-import { convertToDateString, convertToUDS } from '~/utils/utils';
+import { CloseIcon } from '@bigcommerce/big-design-icons';
+import { ScoreCircle } from '~/components/ScoreCircle';
+import { type AnalyzeReviewOutputValues } from '~/server/google-ai/analyze-review';
+import { convertToDateString, convertToUDS, parseScore } from '~/utils/utils';
 
 interface ReviewDetailProps {
   customerOrders: Orders;
   customerReviews: Review[];
   product: Product;
   review: Review;
-  sentimentAnalysis: string;
-  issuesCategories: string | undefined;
+  sentimentAnalysis?: AnalyzeReviewOutputValues;
 }
 
 export const ReviewDetail = ({
@@ -33,11 +35,13 @@ export const ReviewDetail = ({
   product,
   review: reviewProp,
   sentimentAnalysis,
-  issuesCategories,
 }: ReviewDetailProps) => {
   const [review, setReview] = useState(reviewProp);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isDisapproving, setIsDisapproving] = useState(false);
 
   const onApprove = () => {
+    setIsApproving(true);
     fetch('/api/approve-review', {
       method: 'POST',
       body: JSON.stringify({
@@ -47,7 +51,23 @@ export const ReviewDetail = ({
     })
       .then((res) => res.json() as Promise<Review>)
       .then(setReview)
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsApproving(false));
+  };
+
+  const onDisapprove = () => {
+    setIsDisapproving(true);
+    fetch('/api/disapprove-review', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId: product.id,
+        reviewId: review.id,
+      }),
+    })
+      .then((res) => res.json() as Promise<Review>)
+      .then(setReview)
+      .catch((err) => console.log(err))
+      .finally(() => setIsDisapproving(false));
   };
 
   const totalCustomerSpendings = customerOrders.reduce(
@@ -57,10 +77,8 @@ export const ReviewDetail = ({
   );
   const formattedTotalSpendings = convertToUDS(totalCustomerSpendings);
 
-  const issuesCategoriesArray = useMemo(
-    () => issuesCategories?.split(',') ?? [],
-    [issuesCategories]
-  );
+  const sentimentScore = sentimentAnalysis?.score;
+  const parsedScore = parseScore(sentimentScore);
 
   return (
     <div>
@@ -133,96 +151,138 @@ export const ReviewDetail = ({
             </>
           }
           topRightContent={
-            <Tooltip
-              placement="bottom"
-              trigger={
-                <div className="flex aspect-square w-9 cursor-help items-center justify-center rounded-full bg-green-200/80 font-semibold text-green-800">
-                  92
-                </div>
-              }
-            >
-              Overall customer sentiment score
-            </Tooltip>
+            <ScoreCircle
+              score={92}
+              tooltip="Average customer sentiment score"
+            />
           }
         />
       </div>
 
-      <div className="my-6 grid gap-4 sm:grid-cols-2">
-        <Box border="box" padding="small" borderRadius="normal">
-          <h2 className="mb-3 text-2xl font-bold text-gray-600">
-            <span>Sentiment: </span>
-            <span
-              className={clsx({
-                'text-red-500': review.rating < 2,
-                'text-yellow-300': review.rating >= 2 && review.rating < 4,
-                'text-green-500': review.rating >= 4,
-              })}
-            >
-              {review.rating < 2 && 'Negative'}
-              {review.rating >= 2 && review.rating < 4 && 'Neutral'}
-              {review.rating >= 4 && 'Positive'}
-            </span>
+      <div className="my-6 grid grid-cols-5 gap-4">
+        <Box
+          className="col-span-5 flex flex-col sm:col-span-3 lg:col-span-3 2xl:col-span-4"
+          border="box"
+          padding="small"
+          borderRadius="normal"
+        >
+          <h2 className="text-2xl font-semibold text-gray-600">
+            Feedback and Suggestions
           </h2>
-          <div className="flex items-center justify-center rounded-lg bg-gray-50 pb-4">
-            <GaugeComponent
-              labels={{
-                valueLabel: { hide: true },
-                markLabel: {
-                  hideMinMax: true,
-                  valueConfig: { hide: true },
-                },
-              }}
-              arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
-              pointer={{ type: 'needle', color: '#9ca3af' }}
-              type="semicircle"
-              value={review.rating * 20}
-            />
-          </div>
-        </Box>
-        <Box border="box" padding="small" borderRadius="normal">
-          <div className="flex h-full flex-col items-center justify-center">
-            <div>
-              <AIChatBubble message={sentimentAnalysis} />
+
+          <div className="flex flex-1 flex-col items-center justify-center pb-3 pt-4">
+            <div className="space-y-3">
+              <AIChatBubble message={sentimentAnalysis?.description} />
+
               <div className="w-[calc(100%-62px)]">
                 <AIChatBubble
                   message={
                     <IssuesBadges
-                      issuesCategoriesArray={issuesCategoriesArray}
+                      issuesCategoriesArray={
+                        sentimentAnalysis?.issueCategories ?? []
+                      }
                     />
                   }
                   hideAvatar
                 />
               </div>
-            </div>
 
-            <div className="mt-8">
-              <h3 className="mb-3 mt-0 text-lg font-medium text-gray-600">
-                Suggested Actions
-              </h3>
+              <div className="pl-16">
+                {review.status !== 'approved' &&
+                  (parsedScore.isNeutral || parsedScore.isPositive) && (
+                    <Button
+                      iconLeft={<CheckIcon className="h-6 w-6" />}
+                      isLoading={isApproving}
+                      onClick={onApprove}
+                    >
+                      Approve
+                    </Button>
+                  )}
 
-              <div>
-                <Button
-                  disabled={review.status === 'approved'}
-                  iconLeft={<CheckIcon className="h-6 w-6" />}
-                  onClick={onApprove}
-                >
-                  Approve
-                </Button>
+                {review.status !== 'disapproved' && parsedScore.isNegative && (
+                  <Button
+                    iconLeft={<CloseIcon className="h-6 w-6" />}
+                    isLoading={isDisapproving}
+                    onClick={onDisapprove}
+                  >
+                    Disapprove
+                  </Button>
+                )}
 
-                <Button
-                  iconLeft={<HeartIcon className="h-6 w-6" />}
-                  variant="secondary"
-                >
-                  Thank you email
-                </Button>
+                {parsedScore.isPositive && (
+                  <Button
+                    iconLeft={<HeartIcon className="h-6 w-6" />}
+                    variant="secondary"
+                  >
+                    Thank you email
+                  </Button>
+                )}
 
-                <Button
-                  iconLeft={<EnvelopeIcon className="h-6 w-6" />}
-                  variant="secondary"
-                >
-                  Follow-up email
-                </Button>
+                {(parsedScore.isNeutral || parsedScore.isNegative) && (
+                  <Button
+                    iconLeft={<EnvelopeIcon className="h-6 w-6" />}
+                    variant="secondary"
+                  >
+                    Follow-up email
+                  </Button>
+                )}
               </div>
+            </div>
+          </div>
+        </Box>
+
+        <Box
+          className="col-span-5 sm:col-span-2 lg:col-span-2 2xl:col-span-1"
+          border="box"
+          padding="small"
+          borderRadius="normal"
+        >
+          <div className="mb-4">
+            <h2 className="mb-3 text-2xl font-semibold text-gray-600">
+              <span>Sentiment</span>{' '}
+              <span
+                className={clsx('rounded-md px-2 font-semibold capitalize', {
+                  'bg-red-500 text-white': parsedScore.isNegative,
+                  'bg-yellow-300 text-yellow-800': parsedScore.isNeutral,
+                  'bg-green-500 text-white': parsedScore.isPositive,
+                })}
+              >
+                {parsedScore.string.toLowerCase()}
+              </span>
+            </h2>
+
+            <div className="max-w-xs rounded-lg border border-gray-100 bg-gray-50 pb-4 md:max-w-none">
+              <GaugeComponent
+                labels={{
+                  valueLabel: { hide: true },
+                  markLabel: {
+                    hideMinMax: true,
+                    valueConfig: { hide: true },
+                  },
+                }}
+                arc={{ colorArray: ['#ef4444', '#fde047', '#22c55e'] }}
+                pointer={{ type: 'needle', color: '#9ca3af' }}
+                type="semicircle"
+                value={sentimentScore}
+                style={{ maxWidth: '100%' }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-2xl font-semibold text-gray-600">
+              Keywords
+            </h3>
+
+            <div className="flex flex-wrap items-baseline gap-2 text-lg">
+              {sentimentAnalysis?.keywords?.map((keyword) => (
+                <div
+                  key={keyword}
+                  className="rounded-full border border-gray-200 bg-gray-100 px-3 py-1.5 capitalize"
+                >
+                  {keyword}
+                </div>
+              ))}
             </div>
           </div>
         </Box>
