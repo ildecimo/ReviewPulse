@@ -50,8 +50,11 @@ export const ReviewDetail = ({
   sentimentAnalysis,
 }: ReviewDetailProps) => {
   const [review, setReview] = useState(reviewProp);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isDisapproving, setIsDisapproving] = useState(false);
 
   const onApprove = () => {
+    setIsApproving(true);
     fetch('/api/approve-review', {
       method: 'POST',
       body: JSON.stringify({
@@ -61,7 +64,23 @@ export const ReviewDetail = ({
     })
       .then((res) => res.json() as Promise<Review>)
       .then(setReview)
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsApproving(false));
+  };
+
+  const onDisapprove = () => {
+    setIsDisapproving(true);
+    fetch('/api/disapprove-review', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId: product.id,
+        reviewId: review.id,
+      }),
+    })
+      .then((res) => res.json() as Promise<Review>)
+      .then(setReview)
+      .catch((err) => console.log(err))
+      .finally(() => setIsDisapproving(false));
   };
 
   const totalCustomerSpendings = customerOrders.reduce(
@@ -195,6 +214,7 @@ export const ReviewDetail = ({
                 {review.status !== 'approved' && (isNeutral || isPositive) && (
                   <Button
                     iconLeft={<CheckIcon className="h-6 w-6" />}
+                    isLoading={isApproving}
                     onClick={onApprove}
                   >
                     Approve
@@ -202,8 +222,12 @@ export const ReviewDetail = ({
                 )}
 
                 {review.status !== 'disapproved' && isNegative && (
-                  <Button disabled iconLeft={<CloseIcon className="h-6 w-6" />}>
-                    Disapprove (TODO)
+                  <Button
+                    iconLeft={<CloseIcon className="h-6 w-6" />}
+                    isLoading={isDisapproving}
+                    onClick={onDisapprove}
+                  >
+                    Disapprove
                   </Button>
                 )}
 
