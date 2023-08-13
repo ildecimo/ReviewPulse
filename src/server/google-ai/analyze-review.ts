@@ -17,6 +17,7 @@ type AnalyzeReviewInputOptions = z.infer<typeof analyzeReviewInputSchema>;
 export const analyzeReviewOutputSchema = z.object({
   description: z.string(),
   issueCategories: z.array(z.string()),
+  complimentCategories: z.array(z.string()),
   keywords: z.array(z.string()),
   score: z.number(),
 });
@@ -24,22 +25,6 @@ export const analyzeReviewOutputSchema = z.object({
 export type AnalyzeReviewOutputValues = Zod.infer<
   typeof analyzeReviewOutputSchema
 >;
-
-const analyzeIssuesCategorySchema = z.object({
-  rating: z.number(),
-  title: z.string(),
-  text: z.string(),
-});
-
-type AnalyzeIssuesCategoryOptions = z.infer<typeof analyzeIssuesCategorySchema>;
-
-const prepareInput = (options: AnalyzeReviewInputOptions): string => {
-  return `
-"Title": ${options.title}
-"Description": ${options.text}
-"Rating": ${options.rating} / 5
-  `;
-};
 
 export async function analyzeReview(options: AnalyzeReviewInputOptions) {
   // @todo: store results in firestore to avoid recalling the API for already-analysed reviews.
@@ -59,6 +44,7 @@ Output Format:
 {
    "description": string,
    "issueCategories": Array<"shipping" | "product quality" | "product packaging" | "customer service" | "payment process" | "price" | "return and refund" | "sales and promotions" | "website experience" | "customer expectations">,
+   "complimentCategories": Array<"shipping" | "product quality" | "product packaging" | "customer service" | "payment process" | "price" | "return and refund" | "sales and promotions" | "website experience" | "customer expectations">,
    "keywords": Array<string>,
    "score": number
 }
@@ -69,6 +55,7 @@ Output Format details:
 
 - "description:" A text description of 40 to 50 words explaining the customer's feelings based on their review.
 - "issueCategories": Based on provided review, if there are issues, provide categories of the issue from the specified union type. If there are no issues provide an empty array.
+- "complimentCategories": Based on provided review, if there are compliments, provide categories of the compliment from the specified union type. If there are no compliments provide an empty array.
 - "keywords": The main words or phrases from the review that most influenced the determined sentiment.
 - "score": The sentiment score evaluated from the customer's review. This must be a number from 0 to 100, where 0 - 32 is the negative range, 33 - 65 is the neutral range, and 66 - 100 is the positive range.
 
@@ -93,7 +80,7 @@ The review to analyze:
       const output = response[0].candidates[0]?.output;
 
       if (env.NODE_ENV === 'development') {
-        console.log('*** [Vertex Output] ::', output);
+        console.log('*** [Vertex Review Analysis Output] ::', output);
       }
 
       if (output) {
@@ -115,31 +102,4 @@ The review to analyze:
   return 'No response from Google AI';
 }
 
-export async function analyzeIssuesCategory(
-  options: AnalyzeIssuesCategoryOptions
-) {
-  const input = prepareInput(options);
 
-  const prompt = `Act as an e-commerce customer care expert who analyzes product reviews.
-    Task: Based on provided review, if there are issues respond with one or multiple categories of the issue from [shipping, product quality, product packaging, customer service, payment process, price, return and refund, sales and promotions, website experience, customer expectations]. 
-    If the review does not contain issues, respond with "no issues". If the review contains multiple issues, respond with all of them separated by commas.
-    Review: ${input}
-    `;
-
-  try {
-    const client = new TextServiceClient({
-      authClient: new GoogleAuth().fromAPIKey(API_KEY),
-    });
-
-    const response = await client.generateText({
-      model: MODEL_NAME,
-      prompt: { text: prompt },
-    });
-
-    if (response && response[0] && response[0].candidates) {
-      return response[0].candidates[0]?.output || 'No response from Google AI';
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}

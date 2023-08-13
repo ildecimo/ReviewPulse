@@ -1,24 +1,26 @@
 'use client';
 
 import { Box, Button } from '@bigcommerce/big-design';
-import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
+import { CloseIcon } from '@bigcommerce/big-design-icons';
+import { CheckIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
 import { useState } from 'react';
 import GaugeComponent from 'react-gauge-component';
 
 import { type Product, type Review } from 'types';
 import { type Orders } from '~/server/bigcommerce-api/schemas';
+import { type AnalyzeReviewOutputValues } from '~/server/google-ai/analyze-review';
 
 import { AIChatBubble } from '~/components/AIChatBubble';
 import { Breadcrumbs } from '~/components/Breadcrumbs';
 import { Card } from '~/components/Card';
-import { IssuesBadges } from '~/components/IssueBadges';
+import { ComplimentBadges } from '~/components/ComplimentBadges';
+import { GenerateEmailButton } from '~/components/GenerateEmailButton';
+import { IssueBadges } from '~/components/IssueBadges';
 import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
+import { ScoreCircle } from '~/components/ScoreCircle';
 import { StarRating } from '~/components/StarRating';
 
-import { CloseIcon } from '@bigcommerce/big-design-icons';
-import { ScoreCircle } from '~/components/ScoreCircle';
-import { type AnalyzeReviewOutputValues } from '~/server/google-ai/analyze-review';
 import { convertToDateString, convertToUDS, parseScore } from '~/utils/utils';
 
 interface ReviewDetailProps {
@@ -177,9 +179,22 @@ export const ReviewDetail = ({
               <div className="w-[calc(100%-62px)]">
                 <AIChatBubble
                   message={
-                    <IssuesBadges
+                    <IssueBadges
                       issuesCategoriesArray={
                         sentimentAnalysis?.issueCategories ?? []
+                      }
+                    />
+                  }
+                  hideAvatar
+                />
+              </div>
+
+              <div className="w-[calc(100%-62px)]">
+                <AIChatBubble
+                  message={
+                    <ComplimentBadges
+                      complimentCategoriesArray={
+                        sentimentAnalysis?.complimentCategories ?? []
                       }
                     />
                   }
@@ -210,21 +225,11 @@ export const ReviewDetail = ({
                 )}
 
                 {parsedScore.isPositive && (
-                  <Button
-                    iconLeft={<HeartIcon className="h-6 w-6" />}
-                    variant="secondary"
-                  >
-                    Thank you email
-                  </Button>
+                  <GenerateEmailButton variant="thank-you" review={review} />
                 )}
 
                 {(parsedScore.isNeutral || parsedScore.isNegative) && (
-                  <Button
-                    iconLeft={<EnvelopeIcon className="h-6 w-6" />}
-                    variant="secondary"
-                  >
-                    Follow-up email
-                  </Button>
+                  <GenerateEmailButton variant="follow-up" review={review} />
                 )}
               </div>
             </div>
