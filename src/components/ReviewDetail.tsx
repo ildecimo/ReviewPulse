@@ -17,8 +17,9 @@ import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
 import { StarRating } from '~/components/StarRating';
 
 import { CloseIcon } from '@bigcommerce/big-design-icons';
+import { ScoreCircle } from '~/components/ScoreCircle';
 import { type AnalyzeReviewOutputValues } from '~/server/google-ai/analyze-review';
-import { convertToDateString, convertToUDS } from '~/utils/utils';
+import { convertToDateString, convertToUDS, parseScore } from '~/utils/utils';
 
 interface ReviewDetailProps {
   customerOrders: Orders;
@@ -27,20 +28,6 @@ interface ReviewDetailProps {
   review: Review;
   sentimentAnalysis?: AnalyzeReviewOutputValues;
 }
-
-enum Sentiment {
-  NEGATIVE = 'NEGATIVE',
-  NEUTRAL = 'NEUTRAL',
-  POSITIVE = 'POSITIVE',
-}
-
-const getSentimentString = (score: number) => {
-  if (score < 33) return Sentiment.NEGATIVE;
-
-  if (score >= 33 && score < 66) return Sentiment.NEUTRAL;
-
-  return Sentiment.POSITIVE;
-};
 
 export const ReviewDetail = ({
   customerOrders,
@@ -90,12 +77,8 @@ export const ReviewDetail = ({
   );
   const formattedTotalSpendings = convertToUDS(totalCustomerSpendings);
 
-  const sentimentScore = sentimentAnalysis?.score ?? 0;
-  const sentimentString = getSentimentString(sentimentScore);
-
-  const isPositive = sentimentString === Sentiment.POSITIVE;
-  const isNeutral = sentimentString === Sentiment.NEUTRAL;
-  const isNegative = sentimentString === Sentiment.NEGATIVE;
+  const sentimentScore = sentimentAnalysis?.score;
+  const parsedScore = parseScore(sentimentScore);
 
   return (
     <div>
@@ -171,8 +154,8 @@ export const ReviewDetail = ({
             <Tooltip
               placement="bottom"
               trigger={
-                <div className="flex aspect-square w-9 cursor-help items-center justify-center rounded-full bg-green-200/80 font-semibold text-green-800">
-                  92
+                <div className="cursor-help">
+                  <ScoreCircle score={92} />
                 </div>
               }
             >
@@ -211,17 +194,18 @@ export const ReviewDetail = ({
               </div>
 
               <div className="pl-16">
-                {review.status !== 'approved' && (isNeutral || isPositive) && (
-                  <Button
-                    iconLeft={<CheckIcon className="h-6 w-6" />}
-                    isLoading={isApproving}
-                    onClick={onApprove}
-                  >
-                    Approve
-                  </Button>
-                )}
+                {review.status !== 'approved' &&
+                  (parsedScore.isNeutral || parsedScore.isPositive) && (
+                    <Button
+                      iconLeft={<CheckIcon className="h-6 w-6" />}
+                      isLoading={isApproving}
+                      onClick={onApprove}
+                    >
+                      Approve
+                    </Button>
+                  )}
 
-                {review.status !== 'disapproved' && isNegative && (
+                {review.status !== 'disapproved' && parsedScore.isNegative && (
                   <Button
                     iconLeft={<CloseIcon className="h-6 w-6" />}
                     isLoading={isDisapproving}
@@ -231,7 +215,7 @@ export const ReviewDetail = ({
                   </Button>
                 )}
 
-                {isPositive && (
+                {parsedScore.isPositive && (
                   <Button
                     iconLeft={<HeartIcon className="h-6 w-6" />}
                     variant="secondary"
@@ -240,7 +224,7 @@ export const ReviewDetail = ({
                   </Button>
                 )}
 
-                {(isNeutral || isNegative) && (
+                {(parsedScore.isNeutral || parsedScore.isNegative) && (
                   <Button
                     iconLeft={<EnvelopeIcon className="h-6 w-6" />}
                     variant="secondary"
@@ -264,12 +248,12 @@ export const ReviewDetail = ({
               <span>Sentiment</span>{' '}
               <span
                 className={clsx('rounded-md px-2 font-semibold capitalize', {
-                  'bg-red-500 text-white': isNegative,
-                  'bg-yellow-300 text-yellow-800': isNeutral,
-                  'bg-green-500 text-white': isPositive,
+                  'bg-red-500 text-white': parsedScore.isNegative,
+                  'bg-yellow-300 text-yellow-800': parsedScore.isNeutral,
+                  'bg-green-500 text-white': parsedScore.isPositive,
                 })}
               >
-                {sentimentString.toLowerCase()}
+                {parsedScore.string.toLowerCase()}
               </span>
             </h2>
 

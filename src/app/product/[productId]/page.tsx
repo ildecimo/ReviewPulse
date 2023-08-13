@@ -7,14 +7,13 @@ import {
 } from '~/server/bigcommerce-api';
 
 import { ProductReviewList } from '~/components/ProductReviewList';
+import { getReviewAnalysesByProductId } from '~/lib/db';
 
 interface PageProps {
   params: { productId: string };
 }
 
 export default async function Page(props: PageProps) {
-  const { productId } = props.params;
-
   const authorized = authorize();
 
   if (!authorized) {
@@ -27,19 +26,24 @@ export default async function Page(props: PageProps) {
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
-  const id = Number(productId);
+  const productId = Number(props.params.productId);
 
-  const product = await fetchProductWithAttributes(
-    id,
-    accessToken,
-    authorized.storeHash
-  );
-
-  const reviews = await fetchReviews(id, accessToken, authorized.storeHash);
+  const [product, reviews, reviewAnalyses] = await Promise.all([
+    fetchProductWithAttributes(productId, accessToken, authorized.storeHash),
+    fetchReviews(productId, accessToken, authorized.storeHash),
+    getReviewAnalysesByProductId({
+      productId,
+      storeHash: authorized.storeHash,
+    }),
+  ]);
 
   return (
     <div>
-      <ProductReviewList product={product} reviews={reviews} />
+      <ProductReviewList
+        product={product}
+        reviews={reviews}
+        reviewAnalyses={reviewAnalyses ?? []}
+      />
     </div>
   );
 }

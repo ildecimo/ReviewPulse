@@ -1,12 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import {
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
+import { z } from 'zod';
 import { env } from '~/env.mjs';
 import {
   AnalyzeReviewOutputValues,
@@ -169,4 +172,43 @@ export async function setReviewAnalysis({
   );
 
   await setDoc(ref, analysis);
+}
+
+const reviewAnalysesListSchema = z.array(
+  z.object({ id: z.string(), data: analyzeReviewOutputSchema })
+);
+
+export type ReviewAnalysesByProductIdResponse = Zod.infer<
+  typeof reviewAnalysesListSchema
+>;
+
+export async function getReviewAnalysesByProductId({
+  productId,
+  storeHash,
+}: {
+  productId: number;
+  storeHash: string;
+}): Promise<ReviewAnalysesByProductIdResponse | null> {
+  if (!storeHash) return null;
+
+  const ref = collection(
+    db,
+    'reviewAnalysis',
+    storeHash,
+    'products',
+    `${productId}`,
+    'reviews'
+  );
+
+  const snapshot = await getDocs(ref);
+
+  const parsedAnalyses = reviewAnalysesListSchema.safeParse(
+    snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }))
+  );
+
+  if (!parsedAnalyses.success) {
+    return null;
+  }
+
+  return parsedAnalyses.data;
 }

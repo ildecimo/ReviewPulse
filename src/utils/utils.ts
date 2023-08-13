@@ -1,4 +1,5 @@
 import { type NewProduct, type Product } from 'types';
+import { Sentiment } from 'types/sentiment';
 import { STYLE_OPTIONS } from '~/constants';
 import { type PromptAttributes } from '~/context/PromptAttributesContext';
 interface KeyToLabelMap {
@@ -71,7 +72,7 @@ export const convertToDateString = (date: string) => {
     day: 'numeric',
     hour: 'numeric',
   });
-}
+};
 
 export const convertToUDS = (price: number) => {
   const USDollar = new Intl.NumberFormat('en-US', {
@@ -80,4 +81,24 @@ export const convertToUDS = (price: number) => {
   });
 
   return USDollar.format(price);
+};
+
+const getSentimentString = (score: number) => {
+  if (score < 33) return Sentiment.NEGATIVE;
+
+  if (score >= 33 && score < 66) return Sentiment.NEUTRAL;
+
+  return Sentiment.POSITIVE;
+};
+
+export const parseScore = (score?: number) => {
+  const sentimentString =
+    typeof score === 'number' ? getSentimentString(score) : '';
+
+  const isPositive = sentimentString === Sentiment.POSITIVE;
+  const isNeutral = sentimentString === Sentiment.NEUTRAL;
+  const isNegative = sentimentString === Sentiment.NEGATIVE;
+  const isNull = sentimentString === '';
+
+  return { isPositive, isNeutral, isNegative, isNull, string: sentimentString };
 };
