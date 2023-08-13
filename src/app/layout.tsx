@@ -10,7 +10,9 @@ const sourceSans = Source_Sans_3({
   weight: ['300', '400', '600', '700', '800'],
 });
 
-export const metadata: Metadata = { title: 'Review Pulse - ildecimo BigAI' };
+export const metadata: Metadata = {
+  title: 'Review Pulse - ildecimo BigCommerce Google Vertex AI App',
+};
 
 export default function RootLayout({
   children,

@@ -22,4 +22,4 @@ export const STYLE_OPTIONS = [
 export const BIGCOMMERCE_LOGIN_URL = 'https://login.bigcommerce.com';
 export const BIGCOMMERCE_API_URL = 'https://api.bigcommerce.com';
 
-export const AUTH_COOKIE_NAME = 'bc-ai-app-auth-token';
+export const AUTH_COOKIE_NAME = 'bc-ai-review-pulse';
