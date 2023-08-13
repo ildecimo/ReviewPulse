@@ -46,10 +46,14 @@ export const ProductReviewList = ({
 
   const averageSentiment = useMemo(
     () =>
-      Math.floor(
-        reviewAnalyses.reduce((acc, analysis) => acc + analysis.data.score, 0) /
-          reviewAnalyses.length
-      ),
+      reviewAnalyses?.length
+        ? Math.floor(
+            reviewAnalyses.reduce(
+              (acc, analysis) => acc + analysis.data.score,
+              0
+            ) / reviewAnalyses.length
+          )
+        : undefined,
     [reviewAnalyses]
   );
 
