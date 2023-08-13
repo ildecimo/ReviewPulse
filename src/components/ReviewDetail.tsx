@@ -182,9 +182,9 @@ export const ReviewDetail = ({
         />
       </div>
 
-      <div className="my-6 grid grid-cols-4 gap-4">
+      <div className="my-6 grid grid-cols-5 gap-4">
         <Box
-          className="col-span-4 flex flex-col md:col-span-2 lg:col-span-3"
+          className="col-span-5 flex flex-col sm:col-span-3 lg:col-span-3 2xl:col-span-4"
           border="box"
           padding="small"
           borderRadius="normal"
@@ -254,7 +254,7 @@ export const ReviewDetail = ({
         </Box>
 
         <Box
-          className="col-span-4 md:col-span-2 lg:col-span-1"
+          className="col-span-5 sm:col-span-2 lg:col-span-2 2xl:col-span-1"
           border="box"
           padding="small"
           borderRadius="normal"

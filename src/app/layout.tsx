@@ -10,7 +10,7 @@ const sourceSans = Source_Sans_3({
   weight: ['300', '400', '600', '700', '800'],
 });
 
-export const metadata: Metadata = { title: 'Product description generator' };
+export const metadata: Metadata = { title: 'Review Pulse - ildecimo BigAI' };
 
 export default function RootLayout({
   children,
