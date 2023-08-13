@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Tooltip } from '@bigcommerce/big-design';
+import { Box, Button } from '@bigcommerce/big-design';
 import { CheckIcon, EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
 import { useState } from 'react';
@@ -151,16 +151,10 @@ export const ReviewDetail = ({
             </>
           }
           topRightContent={
-            <Tooltip
-              placement="bottom"
-              trigger={
-                <div className="cursor-help">
-                  <ScoreCircle score={92} />
-                </div>
-              }
-            >
-              Overall customer sentiment score
-            </Tooltip>
+            <ScoreCircle
+              score={92}
+              tooltip="Average customer sentiment score"
+            />
           }
         />
       </div>

@@ -1,4 +1,5 @@
 'use client';
+
 import { type Product, type Review } from 'types';
 
 import { Table } from '@bigcommerce/big-design';
@@ -107,7 +108,12 @@ export const ProductReviewList = ({
                 </div>
               </>
             }
-            topRightContent={<ScoreCircle score={averageSentiment} />}
+            topRightContent={
+              <ScoreCircle
+                score={averageSentiment}
+                tooltip="Average product sentiment"
+              />
+            }
           />
         </div>
 
@@ -116,14 +122,23 @@ export const ProductReviewList = ({
             {
               header: 'Score',
               hash: 'score',
-              render: (review) => (
-                <ScoreCircle
-                  score={
-                    reviewAnalyses?.find((r) => r.id === `${review.id}`)?.data
-                      ?.score
-                  }
-                />
-              ),
+              render: (review) => {
+                const score = reviewAnalyses?.find(
+                  (r) => r.id === `${review.id}`
+                )?.data?.score;
+
+                return (
+                  <ScoreCircle
+                    score={score}
+                    tooltip={
+                      typeof score === 'number'
+                        ? 'Sentiment score'
+                        : 'Unanalyzed review'
+                    }
+                    tooltipPlacement="right"
+                  />
+                );
+              },
             },
             {
               header: 'Rating',
