@@ -167,10 +167,10 @@ const createReviewsAppExtensionMutation = () => ({
       model: 'PRODUCTS',
       url: '/product/${id}',
       label: {
-        defaultValue: 'Product Review AI',
+        defaultValue: 'ildecimo Review Pulse',
         locales: [
           {
-            value: 'Product Review AI',
+            value: 'ildecimo Review Pulse',
             localeCode: 'en-US',
           },
         ],

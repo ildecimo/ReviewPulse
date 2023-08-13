@@ -1,8 +1,8 @@
 {
-  "name": "bc-ai-ildecimo-app",
+  "name": "reviewpulse",
   "version": "0.0.1",
-  "author": "BigCommerce",
-  "description": "BigCommerce Single-click App for enabling AI capabilities in CP",
+  "author": "ildecimo",
+  "description": "BigCommerce Single-click App for Reviews with Google Vertex AI",
   "scripts": {
     "build": "next build",
     "dev": "next dev",

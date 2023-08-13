@@ -1,4 +1,4 @@
-name: ildecimo BigAI - Product Review App CI
+name: ildecimo Review Pulse - App CI
 
 on:
   push:
