@@ -1,8 +1,6 @@
 'use client';
 
-import { Box, Button } from '@bigcommerce/big-design';
-import { CloseIcon } from '@bigcommerce/big-design-icons';
-import { CheckIcon } from '@heroicons/react/24/solid';
+import { Box } from '@bigcommerce/big-design';
 import clsx from 'clsx';
 import { useState } from 'react';
 import GaugeComponent from 'react-gauge-component';
