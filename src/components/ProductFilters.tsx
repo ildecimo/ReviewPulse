@@ -1,8 +1,7 @@
-import { Box, Switch } from '@bigcommerce/big-design';
 import { useState } from 'react';
 import { type SimpleProduct } from 'types';
 
-import { ProductSearch } from '~/components/ProductSearch';
+import { Box, Form, FormGroup, Input, Switch } from '@bigcommerce/big-design';
 
 interface ProductFiltersProps {
   setFilteredProducts: (value: SimpleProduct[]) => void;
@@ -14,26 +13,53 @@ export const ProductFilters = ({
   products,
 }: ProductFiltersProps) => {
   const [switchOn, setSwitchOn] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [subFilteredProducts, setSubFilteredProducts] = useState(products);
+
+  const searchProduct = (search: string, products: SimpleProduct[]) => {
+    return products.filter((product) => {
+      return product.name.toLowerCase().includes(search.toLowerCase());
+    });
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+
+    const productsToFilter = switchOn ? subFilteredProducts : products;
+    const filteredProducts = searchProduct(
+      event.target.value,
+      productsToFilter
+    );
+
+    setFilteredProducts(filteredProducts);
+  };
 
   const handleSwitch = () => {
     setSwitchOn(!switchOn);
-    let filteredProducts = products;
+    const productsToFilter = searchValue ? subFilteredProducts : products;
 
-    if (!switchOn) {
-      filteredProducts = products.filter((product) => {
-        return product.reviews_count > 0;
-      });
-    }
+    const filteredProducts = switchOn
+      ? productsToFilter
+      : productsToFilter.filter((product) => product.reviews_count > 0);
 
+    setSubFilteredProducts(filteredProducts);
     setFilteredProducts(filteredProducts);
   };
 
   return (
     <Box border="box" padding="small" borderRadius="normal">
-      <ProductSearch
-        products={products}
-        setFilteredProducts={setFilteredProducts}
-      />
+      <Form>
+        <FormGroup>
+          <Input
+            label="Search products by name"
+            onChange={handleSearch}
+            placeholder="Search"
+            type="text"
+            value={searchValue}
+            required
+          />
+        </FormGroup>
+      </Form>
 
       <div className="mt-4 flex">
         <span className="mr-6 font-bold">Show only products with reviews</span>

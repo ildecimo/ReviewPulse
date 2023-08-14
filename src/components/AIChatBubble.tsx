@@ -7,7 +7,7 @@ interface AIChatBubbleProps {
 
 export const AIChatBubble = ({ message, hideAvatar }: AIChatBubbleProps) => {
   return (
-    <div className="flex max-w-[450px] items-center">
+    <div className="flex max-w-[480px] items-center">
       {!hideAvatar && (
         <div className="mr-4 flex flex-none flex-col items-center space-y-1">
           <Image src="/images/vertex-ai.png" alt="" width={32} height={32} />
