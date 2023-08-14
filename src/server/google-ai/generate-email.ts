@@ -29,25 +29,25 @@ export async function generateAISuggestedEmail(
   options: GenerateEmailInputOptions
 ) {
   const promptEmailBody = `Role: E-commerce customer care expert analyzing product reviews and outputting a result as a string.
-    
-    Task: Based on the input provided, generate a suggested email body response to the customer.
 
-    Input Format:
+Task: Based on the input provided, generate a suggested email body response to the customer. Only provide information based on data you are provided with, don't invent or assume any facts, and don't include any placeholders. The email signature should be "Sincerely, the ildecimo team".
 
-    - "Title": The review title.
-    - "Body": The review body text.
-    - "Rating": The review rating, out of 5.
-    - "Customer": The customer's name.
-    - "Email Type": The type of email to send to the customer. This can be one of the following: "Thank you email" or "Follow-up email".
+Input Format:
 
-    Output Format: string
+- "Review title": The review title.
+- "Review description": The review body text.
+- "Review Rating": The review rating, out of 5.
+- "Customer Name": The customer's name.
+- "Email Type": The type of email to send to the customer. This can be one of the following: "Thank you email" or "Follow-up email".
 
-    Input Data:
-    - "Review Title:" ${options.title},
-    - "Review Description": ${options.text},
-    - "Review Rating": ${options.rating},
-    - "Customer Name": ${options.customer},
-    - "Email Type": ${options.emailType}
+Output Format: string
+
+Input Data:
+- "Review Title:" ${options.title},
+- "Review Description": ${options.text},
+- "Review Rating": ${options.rating},
+- "Customer Name": ${options.customer},
+- "Email Type": ${options.emailType}
   `;
 
   const promptEmailSubject = (
@@ -92,11 +92,11 @@ export async function generateAISuggestedEmail(
 
       if (env.NODE_ENV === 'development') {
         console.log(
-          '*** [Vertex Review Analysis Output Subject] ::',
+          '*** [Vertex Generate Email Output Subject] ::',
           outputEmailSubject
         );
         console.log(
-          '*** [Vertex Review Analysis Output Body] ::',
+          '*** [Vertex Generate Email Output Body] ::',
           outputEmailBody
         );
       }
