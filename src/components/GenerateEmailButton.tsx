@@ -3,7 +3,7 @@ import { EnvelopeIcon, HeartIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 
 import { type Review } from 'types';
-import { type AnalyzeEmailOutputOptions } from '~/server/google-ai/generate-email';
+import { type GenerateEmailOutputOptions } from '~/server/google-ai/generate-email';
 
 interface GenerateEmailButtonProps {
   variant: 'thank-you' | 'follow-up';
@@ -28,7 +28,7 @@ export const GenerateEmailButton = ({
         emailType: isThankYou ? 'thank-you' : 'follow-up',
       }),
     })
-      .then((res) => res.json() as Promise<AnalyzeEmailOutputOptions>)
+      .then((res) => res.json() as Promise<GenerateEmailOutputOptions>)
       .then((res) => {
         const { body, subject } = res;
 

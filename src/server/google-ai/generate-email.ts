@@ -6,7 +6,7 @@ import { env } from '~/env.mjs';
 const MODEL_NAME = 'models/text-bison-001';
 const API_KEY = env.GOOGLE_API_KEY;
 
-const analyzeReviewInputSchema = z.object({
+const generateEmailInputSchema = z.object({
   rating: z.number(),
   title: z.string(),
   text: z.string(),
@@ -14,19 +14,19 @@ const analyzeReviewInputSchema = z.object({
   emailType: z.string(),
 });
 
-type AnalyzeReviewInputOptions = z.infer<typeof analyzeReviewInputSchema>;
+type GenerateEmailInputOptions = z.infer<typeof generateEmailInputSchema>;
 
-const analyzeEmailOutputSchema = z.object({
+const generateEmailOutputSchema = z.object({
   subject: z.string(),
   body: z.string(),
 });
 
-export type AnalyzeEmailOutputOptions = z.infer<
-  typeof analyzeEmailOutputSchema
+export type GenerateEmailOutputOptions = z.infer<
+  typeof generateEmailOutputSchema
 >;
 
 export async function generateAISuggestedEmail(
-  options: AnalyzeReviewInputOptions
+  options: GenerateEmailInputOptions
 ) {
   const promptEmailBody = `Role: E-commerce customer care expert analyzing product reviews and outputting a result as a string.
     
@@ -102,7 +102,7 @@ export async function generateAISuggestedEmail(
       }
 
       if (outputEmailBody) {
-        const parsedOutput = analyzeEmailOutputSchema.safeParse({
+        const parsedOutput = generateEmailOutputSchema.safeParse({
           subject: outputEmailSubject,
           body: outputEmailBody,
         });
