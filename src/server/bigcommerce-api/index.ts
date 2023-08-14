@@ -112,6 +112,28 @@ export const disapproveReview = async ({
   return review;
 };
 
+export const setPendingReview = async ({
+  productId,
+  reviewId,
+  accessToken,
+  storeHash,
+}: {
+  productId: number;
+  reviewId: number;
+  accessToken: string;
+  storeHash: string;
+}): Promise<Review> => {
+  const review = await updateProductReview({
+    productId,
+    reviewId,
+    accessToken,
+    storeHash,
+    reviewData: { status: 'pending' },
+  });
+
+  return review;
+};
+
 // @todo this wrapper isn't really necessary, we should simplify the api. But not today.
 export const fetchCustomerOrders = async ({
   email,

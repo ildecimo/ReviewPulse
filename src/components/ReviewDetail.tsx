@@ -17,6 +17,11 @@ import { Card } from '~/components/Card';
 import { ComplimentBadges } from '~/components/ComplimentBadges';
 import { GenerateEmailButton } from '~/components/GenerateEmailButton';
 import { IssueBadges } from '~/components/IssueBadges';
+import { OverrideActionsPopover } from '~/components/OverrideActionsPopover';
+import {
+  ApproveReviewButton,
+  DisapproveReviewButton,
+} from '~/components/ReviewActionButtons';
 import { ReviewStatusBadge } from '~/components/ReviewStatusBadge';
 import { ScoreCircle } from '~/components/ScoreCircle';
 import { StarRating } from '~/components/StarRating';
@@ -39,38 +44,6 @@ export const ReviewDetail = ({
   sentimentAnalysis,
 }: ReviewDetailProps) => {
   const [review, setReview] = useState(reviewProp);
-  const [isApproving, setIsApproving] = useState(false);
-  const [isDisapproving, setIsDisapproving] = useState(false);
-
-  const onApprove = () => {
-    setIsApproving(true);
-    fetch('/api/approve-review', {
-      method: 'POST',
-      body: JSON.stringify({
-        productId: product.id,
-        reviewId: review.id,
-      }),
-    })
-      .then((res) => res.json() as Promise<Review>)
-      .then(setReview)
-      .catch((err) => console.log(err))
-      .finally(() => setIsApproving(false));
-  };
-
-  const onDisapprove = () => {
-    setIsDisapproving(true);
-    fetch('/api/disapprove-review', {
-      method: 'POST',
-      body: JSON.stringify({
-        productId: product.id,
-        reviewId: review.id,
-      }),
-    })
-      .then((res) => res.json() as Promise<Review>)
-      .then(setReview)
-      .catch((err) => console.log(err))
-      .finally(() => setIsDisapproving(false));
-  };
 
   const totalCustomerSpendings = customerOrders.reduce(
     (acc, order) =>
@@ -168,9 +141,18 @@ export const ReviewDetail = ({
           padding="small"
           borderRadius="normal"
         >
-          <h2 className="text-2xl font-semibold text-gray-600">
-            Feedback and Suggestions
-          </h2>
+          <div className="flex">
+            <h2 className="text-2xl font-semibold text-gray-600">
+              Feedback and Suggestions
+            </h2>
+            <div className="ml-auto">
+              <OverrideActionsPopover
+                review={review}
+                productId={product.id}
+                setReview={setReview}
+              />
+            </div>
+          </div>
 
           <div className="flex flex-1 flex-col items-center justify-center pb-3 pt-4">
             <div className="space-y-3">
@@ -202,26 +184,22 @@ export const ReviewDetail = ({
                 />
               </div>
 
-              <div className="pl-16">
+              <div className="pl-16 pt-4">
                 {review.status !== 'approved' &&
                   (parsedScore.isNeutral || parsedScore.isPositive) && (
-                    <Button
-                      iconLeft={<CheckIcon className="h-6 w-6" />}
-                      isLoading={isApproving}
-                      onClick={onApprove}
-                    >
-                      Approve
-                    </Button>
+                    <ApproveReviewButton
+                      productId={product.id}
+                      reviewId={review.id}
+                      setReview={setReview}
+                    />
                   )}
 
                 {review.status !== 'disapproved' && parsedScore.isNegative && (
-                  <Button
-                    iconLeft={<CloseIcon className="h-6 w-6" />}
-                    isLoading={isDisapproving}
-                    onClick={onDisapprove}
-                  >
-                    Disapprove
-                  </Button>
+                  <DisapproveReviewButton
+                    productId={product.id}
+                    reviewId={review.id}
+                    setReview={setReview}
+                  />
                 )}
 
                 {parsedScore.isPositive && (

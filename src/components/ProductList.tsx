@@ -5,7 +5,7 @@ import { type SimpleProduct } from 'types';
 import { Badge, Table } from '@bigcommerce/big-design';
 import { ArrowLongRightIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Breadcrumbs } from '~/components/Breadcrumbs';
 import { NextLink } from '~/components/NextLink';
@@ -40,6 +40,13 @@ const ReviewsAverage = ({ product }: ReviewsAverageProps) => {
 
 const ProductList = ({ products }: ProductListProps) => {
   const [filteredProducts, setFilteredProducts] = useState(products);
+  const sortedProductsByReviews = useMemo(
+    () =>
+      [...filteredProducts].sort((a, b) => {
+        return b.reviews_count - a.reviews_count;
+      }),
+    [filteredProducts]
+  );
 
   return (
     <div>
@@ -122,7 +129,7 @@ const ProductList = ({ products }: ProductListProps) => {
               ),
             },
           ]}
-          items={filteredProducts}
+          items={sortedProductsByReviews}
         />
       </div>
     </div>
