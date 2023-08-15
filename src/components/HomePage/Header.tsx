@@ -38,7 +38,7 @@ export default function Header() {
             <ul className="flex grow flex-wrap items-center justify-end">
               <li>
                 <Link
-                  href="https://github.com/ildecimo/ReviewPulse"
+                  href="https://reviewpulse.ildecimo.com/"
                   className="btn-sm ml-3 bg-blue-800 text-white hover:bg-blue-700"
                   target="_blank"
                 >

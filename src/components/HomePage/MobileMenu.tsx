@@ -75,7 +75,7 @@ export default function MobileMenu() {
           <ul className="px-5 py-2">
             <li>
               <Link
-                href="https://github.com/ildecimo/ReviewPulse"
+                href="https://reviewpulse.ildecimo.com/"
                 className="btn-sm my-2 w-full bg-blue-800 text-white hover:bg-blue-700"
                 onClick={() => setMobileNavOpen(false)}
                 target="_blank"
