@@ -32,6 +32,7 @@ interface ReviewDetailProps {
   product: Product;
   review: Review;
   sentimentAnalysis?: AnalyzeReviewOutputValues;
+  userAverageScore?: number;
 }
 
 export const ReviewDetail = ({
@@ -40,6 +41,7 @@ export const ReviewDetail = ({
   product,
   review: reviewProp,
   sentimentAnalysis,
+  userAverageScore,
 }: ReviewDetailProps) => {
   const [review, setReview] = useState(reviewProp);
 
@@ -125,7 +127,7 @@ export const ReviewDetail = ({
           }
           topRightContent={
             <ScoreCircle
-              score={92}
+              score={userAverageScore}
               tooltip="Average customer sentiment score"
             />
           }

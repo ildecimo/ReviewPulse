@@ -12,9 +12,12 @@ import { NextLink } from '~/components/NextLink';
 import { ProductFilters } from '~/components/ProductFilters';
 import { StarRating } from '~/components/StarRating';
 
+import { ScoreCircle } from '~/components/ScoreCircle';
+import { type AllReviewAnalysesResponse } from '~/lib/db';
 import { convertToUDS } from '~/utils/utils';
 
 interface ProductListProps {
+  allAnalyses: AllReviewAnalysesResponse;
   products: SimpleProduct[];
 }
 
@@ -38,7 +41,7 @@ const ReviewsAverage = ({ product }: ReviewsAverageProps) => {
   return <StarRating rating={average} />;
 };
 
-const ProductList = ({ products }: ProductListProps) => {
+const ProductList = ({ allAnalyses, products }: ProductListProps) => {
   const [filteredProducts, setFilteredProducts] = useState(products);
   const sortedProductsByReviews = useMemo(
     () =>
@@ -48,11 +51,35 @@ const ProductList = ({ products }: ProductListProps) => {
     [filteredProducts]
   );
 
+  const productScoresById = products?.reduce(
+    (acc, { id: productId }) => {
+      const reviewAnalyses =
+        allAnalyses?.filter((review) => review.productId === `${productId}`) ??
+        [];
+
+      const productScore = reviewAnalyses?.length
+        ? Math.floor(
+            reviewAnalyses.reduce(
+              (acc, analysis) => acc + analysis.data.score,
+              0
+            ) / reviewAnalyses.length
+          )
+        : undefined;
+
+      return {
+        ...acc,
+        [productId]: productScore,
+      };
+    },
+    {} as Record<number, number>
+  );
+
   return (
     <div>
       <Breadcrumbs>
         <Breadcrumbs.Text>All Products</Breadcrumbs.Text>
       </Breadcrumbs>
+
       <div className="my-6">
         <ProductFilters
           products={products}
@@ -84,6 +111,16 @@ const ProductList = ({ products }: ProductListProps) => {
               header: 'Name',
               hash: 'name',
               render: (product) => product.name,
+            },
+            {
+              header: 'Score',
+              hash: 'score',
+              render: (product) => (
+                <ScoreCircle
+                  score={productScoresById[product.id]}
+                  tooltip="Average product sentiment"
+                />
+              ),
             },
             {
               header: 'Price',

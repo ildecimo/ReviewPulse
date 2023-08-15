@@ -44,6 +44,7 @@ export default async function Page(props: PageProps) {
   });
 
   const customerReviews = reviews.filter((r) => r.email === review.email);
+  const customerReviewIdStrings = customerReviews.map((r) => `${r.id}`);
 
   let sentimentAnalysis = await db.getReviewAnalysis({
     productId,
@@ -70,6 +71,20 @@ export default async function Page(props: PageProps) {
     }
   }
 
+  const allAnalyses = await db.getAllReviewAnalyses({
+    storeHash: authorized.storeHash,
+  });
+
+  const allUserAnalyses =
+    allAnalyses?.filter((analysis) =>
+      customerReviewIdStrings.includes(analysis.reviewId)
+    ) ?? [];
+
+  const userAverageScore = allUserAnalyses.length
+    ? allUserAnalyses.reduce((acc, analysis) => acc + analysis.data.score, 0) /
+      allUserAnalyses.length
+    : undefined;
+
   return (
     <ReviewDetail
       sentimentAnalysis={
@@ -81,6 +96,7 @@ export default async function Page(props: PageProps) {
       customerReviews={customerReviews}
       product={product}
       review={review}
+      userAverageScore={userAverageScore}
     />
   );
 }
