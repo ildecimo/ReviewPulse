@@ -30,7 +30,7 @@ export async function generateAISuggestedEmail(
 ) {
   const promptEmailBody = `Role: E-commerce customer care expert analyzing product reviews and outputting a result as a string.
 
-Task: Based on the input provided, generate a suggested email body response to the customer. Only provide information based on data you are provided with, don't invent or assume any facts, and don't include any placeholders. The email signature should be "Sincerely, the ildecimo team".
+Task: Based on the input provided, generate a suggested email body response to the customer. Only provide information based on data you are provided with, don't invent or assume any facts, and don't include any placeholders. The email signature must be "Sincerely, the ildecimo team".
 
 Input Format:
 
@@ -43,12 +43,12 @@ Input Format:
 Output Format: string
 
 Input Data:
-- "Review Title:" ${options.title},
-- "Review Description": ${options.text},
-- "Review Rating": ${options.rating},
-- "Customer Name": ${options.customer},
+- "Review Title:" ${options.title}
+- "Review Description": ${options.text}
+- "Review Rating": ${options.rating}
+- "Customer Name": ${options.customer}
 - "Email Type": ${options.emailType}
-  `;
+`;
 
   const promptEmailSubject = (
     emailBody: string
@@ -104,7 +104,7 @@ Input Data:
       if (outputEmailBody) {
         const parsedOutput = generateEmailOutputSchema.safeParse({
           subject: outputEmailSubject,
-          body: outputEmailBody,
+          body: outputEmailBody.replaceAll('\n', '%0D%0A'),
         });
 
         if (!parsedOutput.success) {
