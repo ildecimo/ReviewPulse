@@ -1,26 +1,34 @@
 'use client';
 
-import { Flex } from '@bigcommerce/big-design';
-import { NextLink } from '~/components/NextLink';
+import '~/styles/home.css';
+
+import Footer from '~/components/HomePage/Footer';
+import Header from '~/components/HomePage/Header';
 
 export const HomePage = () => {
   return (
-    <Flex
-      justifyContent="center"
-      alignItems="center"
-      flexDirection="column"
-      style={{ minHeight: '90vh' }}
-    >
-      <h2 className="text-2xl">Home Page TBD</h2>
-
-      <span className="my-4 max-w-[350px] rounded-md border bg-orange-100 p-2 text-center">
-        Accessing the products page for the first time without visiting the
-        product review through the app extension will result in access token
-        error.
-      </span>
-      <div className="mt-4">
-        <NextLink href="/products">All Products</NextLink>
-      </div>
-    </Flex>
+    <div>
+      <Header />
+      <main className="grow">
+        <section className="relative">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            {/* Hero content */}
+            <div className="pb-12 pt-32 md:pb-20 md:pt-40">
+              {/* Section header */}
+              <div className="pb-12 text-center md:pb-16">
+                <h1 className="leading-tighter mb-4 text-5xl font-extrabold tracking-tighter md:text-6xl">
+                  Welcome to
+                  <br />
+                  <span className="bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
+                    REVIEW PULSE
+                  </span>
+                </h1>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
   );
 };
