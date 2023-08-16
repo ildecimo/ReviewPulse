@@ -1,8 +1,8 @@
-<p style="text-align:center;">
+<p align="center">
   <img alt="Review Pulse" src="public/images/logo.webp" width="100">
 </p>
 
-<h1 style="text-align:center;">ildecimo: Review Pulse <br /> <span style="font-size: 18px;">BigCommerce x Google BigAI Hackathon</span></h1>
+<h1 align="center">ildecimo: Review Pulse <br />BigCommerce x Google BigAI Hackathon</h1>
 
 ## Introduction
 
