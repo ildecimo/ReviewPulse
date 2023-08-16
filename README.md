@@ -20,6 +20,4 @@ For working on the application we have the following scripts:
 
 ## License
 
-Authored and maintained by the **ildecimo** team.
-
-> [ildecimo.com](https://www.ildecimo.com/) · [Twitter](https://twitter.com/ildecimo_web3) · [LinkedIn](https://www.linkedin.com/company/ildecimo)
+Authored and maintained by [**ildecimo**](https://www.ildecimo.com/).
