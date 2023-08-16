@@ -4,6 +4,14 @@
 
 <h1 align="center">ildecimo: Review Pulse <br />BigCommerce x Google BigAI Hackathon</h1>
 
+**Table of contents**
+
+1. [Introduction](#introduction)
+1. [Development](#development)
+1. [License](#license)
+
+---
+
 ## Introduction
 
 [Review Pulse](https://reviewpulse.ildecimo.com/) is a one-click BigCommerce app that helps you organize, understand, and respond to customer feedback.
