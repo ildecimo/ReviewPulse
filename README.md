@@ -14,9 +14,13 @@
 
 ## Introduction
 
-[Review Pulse](https://reviewpulse.ildecimo.com/) is a single-click BigCommerce app to help you organize, understand, and respond to customer feedback.
+**Review Pulse** is a single-click BigCommerce app to help you organize, understand, and respond to customer feedback.
 
-[▶️ Watch walk-through video](https://www.youtube.com/watch?v=qG-rhnudhaw)
+[🖥 Landing page](https://reviewpulse.ildecimo.com/)
+
+[🖥 Production app](https://big-ai-eight.vercel.app/)
+
+[▶️ Walk-through video](https://www.youtube.com/watch?v=qG-rhnudhaw)
 
 ## Development
 
