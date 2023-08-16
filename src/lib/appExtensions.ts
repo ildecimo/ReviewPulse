@@ -37,27 +37,6 @@ export const createAppExtension = async ({
   if (errors && errors.length > 0) {
     throw new Error(errors[0]?.message);
   }
-
-  // Create the review app extension
-
-  const response2 = await fetch(
-    `${BIGCOMMERCE_API_URL}/stores/${storeHash}/graphql`,
-    {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-        'x-auth-token': accessToken,
-      },
-      body: JSON.stringify(createReviewsAppExtensionMutation()),
-    }
-  );
-
-  const { errors: errors2 } = await response2.json();
-
-  if (errors2 && errors2.length > 0) {
-    throw new Error(errors2[0]?.message);
-  }
 };
 
 export const getAppExtensions = async ({
@@ -102,45 +81,6 @@ const getAppExtensionsQuery = () => ({
 });
 
 const createAppExtensionMutation = () => ({
-  query: `
-      mutation AppExtension($input: CreateAppExtensionInput!) {
-          appExtension {
-              createAppExtension(input: $input) {
-              appExtension {
-                    id
-                    context
-                    model
-                    url
-                    label {
-                       defaultValue
-                       locales {
-                        value
-                        localeCode
-                      }
-                    }
-                  }
-              }
-          }
-      }`,
-  variables: {
-    input: {
-      context: 'PANEL',
-      model: 'PRODUCT_DESCRIPTION',
-      url: '/productDescription/${id}',
-      label: {
-        defaultValue: 'Generate text',
-        locales: [
-          {
-            value: 'Generate text',
-            localeCode: 'en-US',
-          },
-        ],
-      },
-    },
-  },
-});
-
-const createReviewsAppExtensionMutation = () => ({
   query: `
       mutation AppExtension($input: CreateAppExtensionInput!) {
           appExtension {

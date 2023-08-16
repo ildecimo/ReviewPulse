@@ -7,7 +7,6 @@ import {
   getDocs,
   getFirestore,
   setDoc,
-  updateDoc,
 } from 'firebase/firestore';
 import { z } from 'zod';
 import { env } from '~/env.mjs';
@@ -161,25 +160,31 @@ export async function setReviewAnalysis({
 }) {
   if (!storeHash) return null;
 
-  const ref = doc(
+  const productRef = doc(
     db,
     'reviewAnalysis',
     storeHash,
     'products',
-    `${productId}`,
-    'reviews',
-    `${reviewId}`
+    `${productId}`
   );
 
-  await setDoc(ref, analysis);
+  const reviewRef = doc(productRef, 'reviews', `${reviewId}`);
+
+  await Promise.all([
+    // Empty product document so we can reference it as a collection in queries
+    setDoc(productRef, {}),
+
+    // @todo: include customerId in firestore
+    setDoc(reviewRef, analysis),
+  ]);
 }
 
-const reviewAnalysesListSchema = z.array(
+const reviewAnalysesByProductIdSchema = z.array(
   z.object({ id: z.string(), data: analyzeReviewOutputSchema })
 );
 
 export type ReviewAnalysesByProductIdResponse = Zod.infer<
-  typeof reviewAnalysesListSchema
+  typeof reviewAnalysesByProductIdSchema
 >;
 
 export async function getReviewAnalysesByProductId({
@@ -202,7 +207,7 @@ export async function getReviewAnalysesByProductId({
 
   const snapshot = await getDocs(ref);
 
-  const parsedAnalyses = reviewAnalysesListSchema.safeParse(
+  const parsedAnalyses = reviewAnalysesByProductIdSchema.safeParse(
     snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }))
   );
 
@@ -211,4 +216,45 @@ export async function getReviewAnalysesByProductId({
   }
 
   return parsedAnalyses.data;
+}
+
+const allReviewAnalysesSchema = z.array(
+  z.object({
+    productId: z.string(),
+    reviewId: z.string(),
+    data: analyzeReviewOutputSchema,
+  })
+);
+
+export type AllReviewAnalysesResponse = Zod.infer<
+  typeof allReviewAnalysesSchema
+>;
+
+export async function getAllReviewAnalyses({
+  storeHash,
+}: {
+  storeHash: string;
+}): Promise<AllReviewAnalysesResponse | null> {
+  if (!storeHash) return null;
+
+  const reviews: AllReviewAnalysesResponse = [];
+
+  const productsRef = collection(db, 'reviewAnalysis', storeHash, 'products');
+  const productsSnapshot = await getDocs(productsRef);
+
+  for (const product of productsSnapshot.docs) {
+    const reviewsRef = collection(product.ref, 'reviews');
+
+    const reviewsSnapshot = await getDocs(reviewsRef);
+
+    for (const review of reviewsSnapshot.docs) {
+      reviews.push({
+        data: review.data() as AllReviewAnalysesResponse[number]['data'],
+        productId: product.id,
+        reviewId: review.id,
+      });
+    }
+  }
+
+  return reviews;
 }

@@ -18,7 +18,10 @@ export default async function Page() {
     throw new Error('Access token not found. Try to re-install the app.');
   }
 
-  const products = await fetchAllProducts(accessToken, authorized.storeHash);
+  const [products, allReviews] = await Promise.all([
+    fetchAllProducts(accessToken, authorized.storeHash),
+    db.getAllReviewAnalyses({ storeHash: authorized.storeHash }),
+  ]);
 
-  return <ProductList products={products} />;
+  return <ProductList allAnalyses={allReviews ?? []} products={products} />;
 }
