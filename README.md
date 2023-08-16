@@ -28,4 +28,5 @@ For working on the application we have the following scripts:
 
 ## License
 
+Released under the [MIT](LICENSE.md) license.<br>
 Authored and maintained by [**ildecimo**](https://www.ildecimo.com/).
